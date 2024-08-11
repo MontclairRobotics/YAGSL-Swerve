@@ -595,6 +595,13 @@ public class Commands555 {
 
   }
 
+  public static Command alignAndShootAuto() {
+    return Commands.sequence(
+      setSprocketAngleWithStop(RobotContainer.shooterLimelight::bestFit),
+      Commands555.shoot(ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.TRANSPORT_SPEED));
+    
+  }
+
   public static Command runTransportManual() {
     return Commands.run(() -> {
       RobotContainer.shooter.transportStart(ShooterConstants.TRANSPORT_SPEED);

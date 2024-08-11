@@ -7,6 +7,7 @@ package frc.robot;
 import java.io.File;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import animation2.AllianceAnimation;
@@ -63,11 +64,6 @@ public class RobotContainer {
   public static Limelight shooterLimelight = new Limelight("limelight-shooter", DetectionType.APRIL_TAG);
   public static Auto auto = new Auto();
 
-  // public static LED led =
-  //     new LED(
-  //         new ConditionalAnimation(getTeleopDefaultAnim())
-  //             .addCase(DriverStation::isDisabled, getDisabledAnimation()),
-  //         new WipeTransition());
   public static Climbers climbers = new Climbers();
   
 
@@ -78,13 +74,14 @@ public class RobotContainer {
   public static boolean isDriverMode = false;
 
   public RobotContainer() {
-    // DriverStation.silenceJoystickConnectionWarning(true);
-    // Shuffleboard.getTab("Debug").addDouble("Speed!", shooterLimelight::getSpeedForSpeaker);
-    // Shuffleboard.getTab("Debug").addBoolean("Is aligned", RobotContainer.shooterLimelight::isAlignedAuto);
-    // Shuffleboard.getTab("Debug").addBoolean("Is at angle", RobotContainer.sprocket::isAtAngle);
-    // Shuffleboard.getTab("Debug").addBoolean("Is at speed", RobotContainer.shooter::isAtSpeed);
-    // Shuffleboard.getTab("Debug").addDouble("Priority ID Angle", RobotContainer.shooterLimelight::getHeadingToPriorityID);
-    //Shuffleboard.getTab("Debug").addDouble("Max Is Dumb", () -> RobotContainer.shooterLimelight.maxIsStupid().getDegrees());
+    NamedCommands.registerCommand("AlignAndShoot", Commands555.alignAndShootAuto());
+
+      
+    NamedCommands.registerCommand("loadNote", Commands555.loadNote());
+
+    NamedCommands.registerCommand("ScoreSubwoofer", Commands555.scoreSubwoofer());
+    
+      
 
     auto.setupPathPlanner();
     auto.setupAutoTab();
