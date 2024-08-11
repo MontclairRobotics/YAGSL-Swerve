@@ -2,29 +2,23 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.37,
+      "x": 1.370328187942505,
       "y": 5.55
     },
-    "rotation": -2.29959703999356e-27
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "ScoreSubwoofer"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4NoteMid.1"
+                  "pathName": "Mid-Nmid"
                 }
               },
               {
@@ -39,7 +33,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ScoreSubwoofer"
+            "name": "AlignAndShoot"
           }
         },
         {
@@ -49,7 +43,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4NoteMid.2"
+                  "pathName": "NMid-NAmp"
                 }
               },
               {
@@ -62,9 +56,15 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "NSource-6"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "ScoreSubwoofer"
+            "name": "AlignAndShoot"
           }
         },
         {
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "4NoteMid.3"
+                  "pathName": "6-N1"
                 }
               },
               {
@@ -87,9 +87,40 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "N1-6.1"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "6-N2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N2-6"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "ScoreSubwoofer"
+            "name": "AlignAndShoot"
           }
         }
       ]
