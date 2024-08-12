@@ -2,23 +2,23 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.370328187942505,
-      "y": 5.55
+      "x": 0.7070891857147217,
+      "y": 6.776917934417725
     },
-    "rotation": 0.0
+    "rotation": 59.93139976160897
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Mid-Nmid"
+                  "pathName": "Amp-NAmp"
                 }
               },
               {
@@ -28,6 +28,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NAmp-AmpPillar"
           }
         },
         {
@@ -43,7 +49,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "NMid-NAmp"
+                  "pathName": "AmpPillar-N1"
                 }
               },
               {
@@ -58,7 +64,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NSource-6"
+            "pathName": "N1-AmpPillar.1"
           }
         },
         {
@@ -74,7 +80,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "6-N1"
+                  "pathName": "AmpPillar-N2.1"
                 }
               },
               {
@@ -89,7 +95,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N1-6.1"
+            "pathName": "N2-AmpPillar.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
           }
         },
         {
@@ -97,15 +109,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "LoadNote"
+                  "pathName": "AmpPillar-N3"
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "6-N2"
+                  "name": "LoadNote"
                 }
               }
             ]
@@ -114,7 +126,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N2-6"
+            "pathName": "N3-AmpPillar"
           }
         },
         {

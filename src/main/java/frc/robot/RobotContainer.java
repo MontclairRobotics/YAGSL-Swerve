@@ -84,7 +84,7 @@ public class RobotContainer {
       
 
     auto.setupPathPlanner();
-    auto.setupAutoTab();
+  
     setupDriverTab();
     
 
