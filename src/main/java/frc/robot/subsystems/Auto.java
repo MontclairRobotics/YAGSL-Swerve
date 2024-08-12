@@ -30,24 +30,17 @@ import frc.robot.Constants.DriveConstants;
 
 import java.util.Optional;
 
-// ^(?=[^A-H1-4]*[A-H1-4])(?=[^0-9]*[0-9])(?!.*[A-Za-z]{2})(?!.*[0-9]{2})[A-H1-4]+$
+
 public class Auto extends SubsystemBase {
 
-  private Command autoCommand = Commands.runOnce(() -> {});
   private final SendableChooser<Command> autoChooser;
-
-
+  
   public Auto() {
     NetworkTableInstance nt = NetworkTableInstance.getDefault();
-    NetworkTable table = nt.getTable("Shuffleboard").getSubTable("Auto");
-
-  
     autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
     SmartDashboard.putData("Auto Mode", autoChooser);
     
-    
   }
-  //TODO maybe add handling in case command is invalid and robot is run?
 
   public Command getAutoCommand() {
     return autoChooser.getSelected();
@@ -72,11 +65,6 @@ public class Auto extends SubsystemBase {
         },
         RobotContainer.drivetrain);
   }
-
-
-  
-
-
 
 }
   
