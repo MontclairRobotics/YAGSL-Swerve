@@ -56,10 +56,12 @@ public final class Constants {
 
 
     public static final double DRIVE_STATOR_CURRENT_LIMIT = 80;
-    public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 80;
-    public static final CurrentLimitsConfigs DRIVE_CONFIG = new CurrentLimitsConfigs()
+    public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 60;
+    public static final CurrentLimitsConfigs DRIVE_CURRENT_CONFIG = new CurrentLimitsConfigs()
       .withStatorCurrentLimitEnable(true)
-      .withStatorCurrentLimit(80);
+      .withStatorCurrentLimit(DRIVE_STATOR_CURRENT_LIMIT)
+      .withSupplyCurrentLimitEnable(true)
+      .withSupplyCurrentLimit(DRIVE_SUPPLY_CURRENT_LIMIT);
       
     public static final double DRIVE_KS = 0.12;
     public static final double DRIVE_KV = 2.8;

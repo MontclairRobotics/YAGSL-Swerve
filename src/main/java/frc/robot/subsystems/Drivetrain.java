@@ -97,6 +97,7 @@ public class Drivetrain extends SubsystemBase {
 
 
 
+
     double kp = swerveDrive.getSwerveController().thetaController.getP();
     double ki = swerveDrive.getSwerveController().thetaController.getI();
     double kd = swerveDrive.getSwerveController().thetaController.getD();
@@ -121,21 +122,10 @@ public class Drivetrain extends SubsystemBase {
       
     for (int i = 0; i < modules.length; i++) {
       modules[i].getAngleMotor().setMotorBrake(true);
-      //TalonFX driveMotor = (TalonFX) modules[i].getDriveMotor().getMotor();
-      //driveMotor.getConfigurator().apply(DriveConstants.DRIVE_CONFIG);
+      TalonFX driveMotor = (TalonFX) modules[i].getDriveMotor().getMotor();
+      driveMotor.getConfigurator().apply(DriveConstants.DRIVE_CURRENT_CONFIG);
     }
-    // ArrayList<TalonFX> motors = new ArrayList<TalonFX>();
-    // motors.add((TalonFX) modules[0].getDriveMotor().getMotor());
-    // motors.add((TalonFX) modules[1].getDriveMotor().getMotor());
-    // motors.add((TalonFX) modules[2].getDriveMotor().getMotor());
-    // motors.add((TalonFX) modules[3].getDriveMotor().getMotor());
-    // orchestra = new Orchestra();
-    // orchestra.addInstrument(motors.get(0));
-    // orchestra.addInstrument(motors.get(1));
-    // orchestra.addInstrument(motors.get(2));
-    // orchestra.addInstrument(motors.get(3));
-    // orchestra.loadMusic("nationGood.chrp");
-
+    
 
 
     getSwerveDrive().getSwerveController().thetaController.setTolerance(DriveConstants.ANGLE_DEADBAND * ((Math.PI ) / 180 ), Units.degreesToRadians(4));

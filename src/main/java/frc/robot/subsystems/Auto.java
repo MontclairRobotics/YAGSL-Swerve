@@ -81,7 +81,6 @@ public class Auto extends SubsystemBase {
     
     Shuffleboard.getTab("Auto").add("Auto Chooser", autoChooser);
 
-    
   }
 
 
