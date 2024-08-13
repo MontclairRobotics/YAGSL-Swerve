@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -15,14 +16,15 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import frc.robot.Commands555;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
@@ -33,20 +35,39 @@ import java.util.Optional;
 
 public class Auto extends SubsystemBase {
 
-  private final SendableChooser<Command> autoChooser;
-  
+  private SendableChooser<Command> autoChooser;
   public Auto() {
-    NetworkTableInstance nt = NetworkTableInstance.getDefault();
-    autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
-    SmartDashboard.putData("Auto Mode", autoChooser);
+    
+    
     
   }
 
   public Command getAutoCommand() {
     return autoChooser.getSelected();
+    
   }
 
-  public void setupPathPlanner() {
+  private void setupAutoSelector() {
+    autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
+    
+    Shuffleboard.getTab("Auto").add("Auto Chooser", autoChooser);
+
+    
+  }
+
+  public void setup() {
+    setupPathPlanner();
+    registerNamedCommands();
+    setupAutoSelector();
+  }
+
+  private void registerNamedCommands() {
+    NamedCommands.registerCommand("AlignAndShoot", Commands555.alignAndShootAuto());
+    NamedCommands.registerCommand("LoadNote", Commands555.loadNote());
+    NamedCommands.registerCommand("ScoreSubwoofer", Commands555.scoreSubwoofer());
+  }
+
+  private void setupPathPlanner() {
     AutoBuilder.configureHolonomic(
         RobotContainer.drivetrain.getSwerveDrive()::getPose, // Robot pose supplier
         RobotContainer.drivetrain.getSwerveDrive()

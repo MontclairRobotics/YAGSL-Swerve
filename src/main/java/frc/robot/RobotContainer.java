@@ -74,18 +74,8 @@ public class RobotContainer {
   public static boolean isDriverMode = false;
 
   public RobotContainer() {
-    NamedCommands.registerCommand("AlignAndShoot", Commands555.alignAndShootAuto());
-
-      
-    NamedCommands.registerCommand("loadNote", Commands555.loadNote());
-
-    NamedCommands.registerCommand("ScoreSubwoofer", Commands555.scoreSubwoofer());
+    auto.setup();
     
-      
-
-    auto.setupPathPlanner();
-  
-    setupDriverTab();
     
 
     drivetrain.setDefaultCommand(

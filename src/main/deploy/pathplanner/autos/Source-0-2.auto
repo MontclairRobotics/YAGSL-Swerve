@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "ScoreSubwoofer"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [

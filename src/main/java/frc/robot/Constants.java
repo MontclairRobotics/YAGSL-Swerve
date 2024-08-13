@@ -61,7 +61,7 @@ public final class Constants {
     public static final boolean IS_OPEN_LOOP = false;
 
     public static final double MAX_VOLTAGE_V = 12.0;
-    public static final double MAX_SPEED = Units.feetToMeters(13);
+    public static final double MAX_SPEED = Units.feetToMeters(11);
 
     public static final double MAX_ROT_SPEED = 2 * Math.PI;
     // Max Acceleration in M/s^2
