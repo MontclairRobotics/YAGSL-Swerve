@@ -82,8 +82,7 @@ public class Shooter extends SubsystemBase {
   Debouncer m_debouncer = new Debouncer(0.3, Debouncer.DebounceType.kRising);
 
   public Shooter() {
-    // Shuffleboard.getTab("Debug").addDouble("Top velocity", () -> {return topEncoder.getVelocity();});
-    // Shuffleboard.getTab("Debug").addDouble("Bottom velocity", () -> {return bottomEncoder.getVelocity();});
+
     topMotor.restoreFactoryDefaults();
     bottomMotor.restoreFactoryDefaults();
     transportMotor.restoreFactoryDefaults();
@@ -91,6 +90,7 @@ public class Shooter extends SubsystemBase {
     topMotor.setInverted(false);
     bottomMotor.setInverted(false);
     transportMotor.setInverted(true);
+
     
 
     topController.setP(Constants.ShooterConstants.TOP_SHOOTER_PID_KP, 1);

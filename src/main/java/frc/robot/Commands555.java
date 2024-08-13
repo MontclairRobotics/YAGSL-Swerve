@@ -251,10 +251,8 @@ public class Commands555 {
     return Commands.run(
         () -> {
           double thetaSpeed = drive
-              .getSwerveDrive()
-              .getSwerveController()
-              .headingCalculate(
-                  drive.getWrappedRotation().getRadians(), rot.get().getRadians());
+              .calculateVelocityForHeading(
+                  rot.get());
 
           double xSpeed = 0;
           double ySpeed = 0;
@@ -294,10 +292,8 @@ public class Commands555 {
     return Commands.run(
         () -> {
           double thetaSpeed = drive
-              .getSwerveDrive()
-              .getSwerveController()
-              .headingCalculate(
-                  drive.getWrappedRotation().getRadians(), rot.get().getRadians());
+              .calculateVelocityForHeading(
+                  rot.get());
 
           double xSpeed = 0;
           double ySpeed = 0;
@@ -326,10 +322,8 @@ public class Commands555 {
     return Commands.run(
         () -> {
           double thetaSpeed = drive
-              .getSwerveDrive()
-              .getSwerveController()
-              .headingCalculate(
-                  drive.getWrappedRotation().getRadians(), rot.get().getRadians());
+              .calculateVelocityForHeading(
+                  rot.get());
 
           RobotContainer.drivetrain.getSwerveDrive().drive(new Translation2d(speeds.getX(), speeds.getY()), thetaSpeed, false, true, new Translation2d() );
           // RobotContainer.drivetrain.drive(targetTranslation, thetaSpeed);
@@ -655,9 +649,14 @@ public class Commands555 {
 
   }
 
- 
 
- 
+  public static Command alignAndShootAuto() {
+    return Commands.sequence(
+      setSprocketAngleWithStop(RobotContainer.shooterLimelight::bestFit),
+      Commands555.shoot(ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.TRANSPORT_SPEED));
+    
+  }
+
 
   public static Command runTransportManual() {
     return Commands.run(() -> {
