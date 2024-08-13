@@ -65,6 +65,7 @@ import org.littletonrobotics.junction.Logger;
 public class Auto extends SubsystemBase {
 
   private SendableChooser<Command> autoChooser;
+
   public Auto() {
     
     
@@ -77,8 +78,8 @@ public class Auto extends SubsystemBase {
   }
 
   private void setupAutoSelector() {
-    autoChooser = AutoBuilder.buildAutoChooser(); // Default auto will be `Commands.none()`
-    
+    autoChooser = AutoBuilder.buildAutoChooser(); 
+    autoChooser.setDefaultOption("Preloaded Only", Commands555.scoreSubwoofer());
     Shuffleboard.getTab("Auto").add("Auto Chooser", autoChooser);
 
   }

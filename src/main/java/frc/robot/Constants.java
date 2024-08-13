@@ -55,7 +55,7 @@ public final class Constants {
     public static Tunable<Double> ki = Tunable.of(0.01, "heading.ki");
 
 
-    public static final double DRIVE_STATOR_CURRENT_LIMIT = 80;
+    public static final double DRIVE_STATOR_CURRENT_LIMIT = 80; // according to some motor calculators 70 might be better
     public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 60;
     public static final CurrentLimitsConfigs DRIVE_CURRENT_CONFIG = new CurrentLimitsConfigs()
       .withStatorCurrentLimitEnable(true)
