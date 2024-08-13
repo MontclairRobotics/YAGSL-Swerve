@@ -8,9 +8,11 @@ import java.util.function.Supplier;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.GeometryUtil;
+
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -26,7 +29,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.math.Math555;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.vision.DetectionType;
 import frc.robot.vision.Limelight;
@@ -41,29 +46,29 @@ public class Commands555 {
    * @param targetTranslation Field-relative Translation2d to drive the robot to.
    * @param theta             Target angle for end position.
    */
-  public static Command driveToRobotRelativePoint(
-      Translation2d targetTranslation, Rotation2d theta) {
-    Pose2d currentRobotPosition = RobotContainer.drivetrain.getSwerveDrive().getPose();
-    Rotation2d currentOdometryHeading = RobotContainer.drivetrain.getSwerveDrive().getOdometryHeading();
+  // public static Command driveToRobotRelativePoint(
+  //     Translation2d targetTranslation, Rotation2d theta) {
+  //   Pose2d currentRobotPosition = RobotContainer.drivetrain.getSwerveDrive().getPose();
+  //   Rotation2d currentOdometryHeading = RobotContainer.drivetrain.getSwerveDrive().getOdometryHeading();
 
-    Translation2d targetTranslation2d = currentRobotPosition
-        .getTranslation()
-        .plus(targetTranslation.rotateBy(currentOdometryHeading));
-    Pose2d botPose = new Pose2d(targetTranslation2d.getX(), targetTranslation2d.getY(), theta);
+  //   Translation2d targetTranslation2d = currentRobotPosition
+  //       .getTranslation()
+  //       .plus(targetTranslation.rotateBy(currentOdometryHeading));
+  //   Pose2d botPose = new Pose2d(targetTranslation2d.getX(), targetTranslation2d.getY(), theta);
 
-    return AutoBuilder.pathfindToPose(
-        botPose,
-        AutoConstants.PATH_CONSTRAINTS,
-        AutoConstants.GOAL_END_VELOCITY,
-        AutoConstants.ROTATION_DELAY_DISTANCE);
-  }
+  //   // return AutoBuilder.pathfindToPose(
+  //   //     botPose,
+  //   //     AutoConstants.PATH_CONSTRAINTS,
+  //   //     AutoConstants.GOAL_END_VELOCITY,
+  //   //     AutoConstants.ROTATION_DELAY_DISTANCE);
+  // }
 
   // Zero gyro
   public static Command zeroGyro() {
     return Commands.runOnce(() -> {
       if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        RobotContainer.drivetrain.getSwerveDrive().zeroGyro();
-        // RobotContainer.drivetrain.getSwerveDrive().resetOdometry(new Pose2d(RobotContainer.drivetrain.getSwerveDrive().getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+        //RobotContainer.drivetrain.getSwerveDrive().zeroGyro();
+        RobotContainer.drivetrain.getSwerveDrive().resetOdometry(new Pose2d(RobotContainer.drivetrain.getSwerveDrive().getPose().getTranslation(), Rotation2d.fromDegrees(180)));
       } else {
         RobotContainer.drivetrain.getSwerveDrive().zeroGyro();
       }
@@ -83,13 +88,13 @@ public class Commands555 {
    *
    * @param botPose field-relative pose2d to drive the robot to.
    */
-  public static Command driveToFieldRelativePoint(Pose2d botPose) {
-    return AutoBuilder.pathfindToPose(
-        botPose,
-        AutoConstants.PATH_CONSTRAINTS,
-        AutoConstants.GOAL_END_VELOCITY,
-        AutoConstants.ROTATION_DELAY_DISTANCE);
-  }
+  // public static Command driveToFieldRelativePoint(Pose2d botPose) {
+  //   return AutoBuilder.pathfindToPose(
+  //       botPose,
+  //       AutoConstants.PATH_CONSTRAINTS,
+  //       AutoConstants.GOAL_END_VELOCITY,
+  //       AutoConstants.ROTATION_DELAY_DISTANCE);
+  // }
 
   /*
    * - - - - - - - - - -
@@ -132,9 +137,9 @@ public class Commands555 {
   }
 
   public static Command unloadNote() {
-    Command alignSprocket = Commands555.setSprocketAngle(ArmConstants.INTAKE_ANGLE);
+    Command alignSprocket = Commands555.setSprocketAngle(ArmConstants.OUTTAKE_ANGLE);
     Command intakeAndTransport = Commands.sequence(alignSprocket,
-        Commands.parallel(Commands555.reverseIntake(), Commands555.transport(-ShooterConstants.TRANSPORT_SPEED)));
+        Commands.parallel(Commands555.reverseIntake(), Commands.sequence(waitForTime(0.5), Commands555.transport(-ShooterConstants.TRANSPORT_SPEED))));
     return intakeAndTransport
         .withName("unload note")
         // .until(() -> {
@@ -146,6 +151,9 @@ public class Commands555 {
         });
 
   }
+
+
+  
 
   public static Command setChassiSpeeds(ChassisSpeeds speeds) {
     return Commands.run(() -> {
@@ -163,7 +171,7 @@ public class Commands555 {
         Commands.parallel(Commands555.alignToLimelightTargetWithStop(RobotContainer.intakeLimelight, DetectionType.NOTE),
             Commands555.setSprocketAngle(ArmConstants.INTAKE_ANGLE)),
         log("Done aligning"),
-        Commands.waitUntil(() -> {return RobotContainer.sprocket.isAtAngle() && RobotContainer.intakeLimelight.isAlignedAuto();}),
+        Commands.waitUntil(() -> {return RobotContainer.sprocket.isAtAngle() && RobotContainer.intakeLimelight.isAligned();}),
         log("Done waiting, hhunting down note"),
         Commands555.transport(ShooterConstants.TRANSPORT_SPEED),
         log("Drive Intaking"),
@@ -256,20 +264,26 @@ public class Commands555 {
                 * DriveConstants.MAX_SPEED;
           }
 
+          if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)  {
+            
+             xSpeed *= -1;
+             ySpeed *= -1;
+          }
+
           RobotContainer.drivetrain.drive(new Translation2d(xSpeed, ySpeed), thetaSpeed);
           // RobotContainer.drivetrain.drive(targetTranslation, thetaSpeed);
         },
         RobotContainer.drivetrain)
         .until(
             () -> {
-              boolean isAligned = Drivetrain.angleDeadband(
-                  RobotContainer.drivetrain.getWrappedRotation(),
-                      rot.get(), Rotation2d.fromDegrees(DriveConstants.ANGLE_DEADBAND));
+              // boolean isAligned = Drivetrain.angleDeadband(
+              //     RobotContainer.drivetrain.getWrappedRotation(),
+              //         rot.get(), Rotation2d.fromDegrees(DriveConstants.ANGLE_DEADBAND));
               // System.out.println(rot.get().getDegrees());
               // System.out.println(isAligned);
               // System.out.println(RobotContainer.drivetrain.getWrappedRotation().getDegrees());
 
-              return isAligned;
+              return RobotContainer.drivetrain.getSwerveDrive().getSwerveController().thetaController.atSetpoint();
             });
   }
 
@@ -289,6 +303,12 @@ public class Commands555 {
                 * DriveConstants.MAX_SPEED;
             xSpeed = -MathUtil.applyDeadband(RobotContainer.driverController.getLeftY(), 0.05)
                 * DriveConstants.MAX_SPEED;
+          }
+
+          if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red)  {
+           
+             xSpeed *= -1;
+             ySpeed *= -1;
           }
 
           RobotContainer.drivetrain.drive(new Translation2d(xSpeed, ySpeed), thetaSpeed);
@@ -373,6 +393,36 @@ public class Commands555 {
         lockDrive);
   }
 
+  public static Command moveToObjectSideways(Limelight camera)
+    {
+        // final double forwardVelocityClamped = Math555.clamp(forwardVelocity, 0, DriveConstants.MAX_SPEED_MPS);
+        Debouncer hasEnded = new Debouncer(0.1, DebounceType.kRising);
+
+        final double DEADBAND = 2;
+        final double SPEED_MUL = -DriveConstants.MAX_SPEED * 0.4;
+
+        Command moveSideways = ifHasTarget(
+            Commands.runOnce(() -> hasEnded.calculate(false))
+                .andThen(Commands.run(() -> RobotContainer.drivetrain.getSwerveDrive().setChassisSpeeds(new ChassisSpeeds(0, -Math555.atLeast(SPEED_MUL * camera.getTXRaw() / 27.0, 0.11), 0)))
+                    .until(() -> hasEnded.calculate(Math.abs(camera.getTXRaw()) < DriveConstants.ANGLE_DEADBAND)))
+        , camera);
+
+
+
+        return moveSideways;
+    }
+
+  public static Command alignToAmp() {
+    double angle = 90;
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      angle = -90;
+    }
+    return Commands.sequence(
+      // alignToLimelightTarget(RobotContainer.shooterLimelight, DetectionType.APRIL_TAG),
+      moveToObjectSideways(RobotContainer.shooterLimelight)
+    );
+  }
+
   /**
    * @param angle     the target angle in robot space
    * @param lockDrive should translational motion be locked
@@ -409,7 +459,7 @@ public class Commands555 {
                 () -> {
                   RobotContainer.drivetrain.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
                   camera.setDefaultPipeline();
-                })); // TODO should we lock drive?
+                })); 
   }
 
   public static Command alignToLimelightTargetExtreme(Limelight camera) {
@@ -459,7 +509,7 @@ public class Commands555 {
                 () -> {
                   RobotContainer.drivetrain.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
                   camera.setDefaultPipeline();
-                })); // TODO should we lock drive?
+                })); 
   }
 
   //ONLY USE IN AUTO JANK AF
@@ -478,12 +528,12 @@ public class Commands555 {
                 },
                 false),
             camera)
-            .until(RobotContainer.drivetrain.thetaController::atSetpoint)
+            .until(camera::isAligned)
             .finallyDo(
                 () -> {
                   RobotContainer.drivetrain.setChassisSpeeds(new ChassisSpeeds(0, 0, 0));
                   camera.setDefaultPipeline();
-                })); // TODO should we lock drive?
+                })); 
   }
 
   public static Command scoreMode() {
@@ -519,33 +569,37 @@ public class Commands555 {
   }
   
 
-  public static Command alignToAmpAndShoot() {
-    Pose2d botPose = RobotContainer.shooterLimelight.getAdjustedPose().pose;
-    Pose2d drivePose = RobotContainer.drivetrain.getSwerveDrive().getPose();
-
-    Translation2d targetTranslation = drivePose.getTranslation();
-    targetTranslation = targetTranslation.plus(RobotContainer.shooterLimelight.getTargetPoseRobotSpace().getTranslation()).minus(new Translation2d(DriveConstants.BUMPER_WIDTH + DriveConstants.DRIVE_BASE_RADIUS, 0));
-
-    Rotation2d rot = Drivetrain.flipAngle(Rotation2d.fromDegrees(270));
-
-    // targetTranslation.plus(AutoConstants.TRANSLATION_FROM_AMP);
-
-    List<Translation2d> points = PathPlannerPath.bezierFromPoses(
-      drivePose,
-      new Pose2d(targetTranslation, rot)
-    );
-
-    PathPlannerPath path = new PathPlannerPath(points, AutoConstants.PATH_CONSTRAINTS, new GoalEndState(0, rot));
-
-    return Commands.sequence(
-      Commands.parallel(
-        AutoBuilder.followPath(path),
-        setSprocketAngle(ArmConstants.AMP_SCORE_ANGLE),
-        spinUpShooter(ShooterConstants.AMP_EJECT_SPEED_TOP, ShooterConstants.AMP_EJECT_SPEED_BOTTOM)
-      ),
-      shoot(ShooterConstants.AMP_EJECT_SPEED_TOP, ShooterConstants.AMP_EJECT_SPEED_BOTTOM, ShooterConstants.TRANSPORT_SPEED)
-    );
+  public static Command angleToSpeaker() {
+    return Commands555.goToAngleFieldRelative(RobotContainer.drivetrain.getSpeakerAngle(), false);
   }
+
+  // public static Command alignToAmpAndShoot() {
+  
+  //   Pose2d drivePose = RobotContainer.drivetrain.getSwerveDrive().getPose();
+
+  //   Translation2d targetTranslation = drivePose.getTranslation();
+  //   targetTranslation = targetTranslation.plus(RobotContainer.shooterLimelight.getTargetPoseRobotSpace().getTranslation()).minus(new Translation2d(DriveConstants.BUMPER_WIDTH + DriveConstants.DRIVE_BASE_RADIUS, 0));
+
+  //   Rotation2d rot = Drivetrain.flipAngle(Rotation2d.fromDegrees(270));
+
+  //   // targetTranslation.plus(AutoConstants.TRANSLATION_FROM_AMP);
+
+  //   List<Translation2d> points = PathPlannerPath.bezierFromPoses(
+  //     drivePose,
+  //     new Pose2d(targetTranslation, rot)
+  //   );
+
+  //   PathPlannerPath path = new PathPlannerPath(points, AutoConstants.PATH_CONSTRAINTS, new GoalEndState(0, rot));
+
+  //   return Commands.sequence(
+  //     Commands.parallel(
+  //       AutoBuilder.followPath(path),
+  //       setSprocketAngle(ArmConstants.AMP_SCORE_ANGLE),
+  //       spinUpShooter(ShooterConstants.AMP_EJECT_SPEED_TOP, ShooterConstants.AMP_EJECT_SPEED_BOTTOM)
+  //     ),
+  //     shoot(ShooterConstants.AMP_EJECT_SPEED_TOP, ShooterConstants.AMP_EJECT_SPEED_BOTTOM, ShooterConstants.TRANSPORT_SPEED)
+  //   );
+  // }
 
   public static Command spinUpShooter(double topSpeed, double bottomSpeed) {
     return Commands.runOnce(() -> {
@@ -567,17 +621,17 @@ public class Commands555 {
     );
   }
 
-  public static Command addVisionMeasurement() {
-    return Commands.runOnce(() -> {
-      LimelightHelpers.PoseEstimate targetPose = RobotContainer.shooterLimelight.getAdjustedPose();
+  // public static Command addVisionMeasurement() {
+  //   return Commands.runOnce(() -> {
+  //     LimelightHelpers.PoseEstimate targetPose = RobotContainer.shooterLimelight.getAdjustedPose();
       
-      RobotContainer.drivetrain.addVisionMeasurement(
-        targetPose.pose,
-        targetPose.timestampSeconds,
-        RobotContainer.shooterLimelight.getVisionStdDevs(targetPose)
-      );
-    });
-  }
+  //     RobotContainer.drivetrain.addVisionMeasurement(
+  //       targetPose.pose,
+  //       targetPose.timestampSeconds,
+  //       RobotContainer.shooterLimelight.getVisionStdDevs(targetPose)
+  //     );
+  //   });
+  // }
  
   // Used during auto for scoring speaker(usually from one of the note locations)
   public static Command scoreModeAuto() {
@@ -595,12 +649,14 @@ public class Commands555 {
 
   }
 
+
   public static Command alignAndShootAuto() {
     return Commands.sequence(
       setSprocketAngleWithStop(RobotContainer.shooterLimelight::bestFit),
       Commands555.shoot(ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.TRANSPORT_SPEED));
     
   }
+
 
   public static Command runTransportManual() {
     return Commands.run(() -> {
@@ -633,7 +689,7 @@ public class Commands555 {
     return cmd.onlyWhile(() -> limey.hasValidTarget());
   }
 
-  // TODO: Look over this
+
   /***
    * @param limey
    * @return A command that drives to the currently targeted april tag
@@ -645,7 +701,7 @@ public class Commands555 {
   // Pose2d aprilTagPose = new Pose2d(new Translation2d(aprilTagPoseArray[0],
   // aprilTagPoseArray[1]), new Rotation2d(aprilTagPoseArray[5]));
   // Pose2d botPose =
-  // aprilTagPose.relativeTo(DriveConstants.EDGE_OF_DRIVEBASE); //TODO does
+  // aprilTagPose.relativeTo(DriveConstants.EDGE_OF_DRIVEBASE);
   // this work the way I think it does
   // return driveToFieldRelativePoint(botPose);
 
@@ -737,7 +793,7 @@ public class Commands555 {
         log("In shoot command, at speed!"),
         Commands555.transport(transportSpeed),
         log("Transported"),
-        Commands555.waitForTime(0.3)) //TODO should be 0.75 maybe and ferry note
+        Commands555.waitForTime(0.3))
         .finallyDo(() -> {
           RobotContainer.shooter.stopTransport();
           if (!DriverStation.isAutonomous()) {
@@ -880,7 +936,7 @@ public class Commands555 {
     }).beforeStarting(() -> {
       camera.setPipelineTo(pipeline);
     }).until(() -> {
-      return camera.getPipelineType() == pipeline; // TODO need to check driver mode?
+      return camera.getPipelineType() == pipeline; 
     });
   }
 
@@ -930,7 +986,9 @@ public class Commands555 {
           RobotContainer.shooter.transportStart(transportSpeed);
         });
   }
-
+  // public static Command translateToAmpCommand() {
+    
+  // }
   public static Command scoreAmp() {
     return Commands.sequence(
         setSprocketAngle(ArmConstants.AMP_SCORE_ANGLE),
@@ -980,7 +1038,7 @@ public class Commands555 {
 
   
 
-  /** TODO ANGLE IS WRONG */
+ 
   public static Command receiveHumanPlayerNote() {
     return Commands.sequence(
         alignToLimelightTarget(RobotContainer.shooterLimelight, DetectionType.APRIL_TAG),

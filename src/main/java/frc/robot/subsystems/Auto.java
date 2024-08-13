@@ -1,7 +1,15 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.util.GeometryUtil;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import com.pathplanner.lib.auto.NamedCommands;
+
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
@@ -12,7 +20,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 import edu.wpi.first.networktables.NetworkTable;
 
+import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,14 +35,33 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Commands555;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ShooterConstants;
+
+import frc.robot.util.Array555;
+
+// import static frc.robot.Constants.ArmConstants.INTAKE_SCORE_ANGLE;
+
+
 import frc.robot.Constants.DriveConstants;
 
+
 import java.util.Optional;
+
+
+import org.littletonrobotics.junction.Logger;
+
 
 
 public class Auto extends SubsystemBase {
@@ -54,6 +85,7 @@ public class Auto extends SubsystemBase {
 
     
   }
+
 
   public void setup() {
     setupPathPlanner();
@@ -85,7 +117,21 @@ public class Auto extends SubsystemBase {
           return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
         },
         RobotContainer.drivetrain);
+
+
+    
+    PathPlannerLogging.setLogActivePathCallback(
+        (activePath) -> {
+          Logger.recordOutput(
+              "Auto/ActivePath", activePath.toArray(new Pose2d[activePath.size()]));
+        });
+
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (targetPose) -> {
+          Logger.recordOutput("Auto/TargetPose", targetPose);
+        });
   }
+
 
 }
   

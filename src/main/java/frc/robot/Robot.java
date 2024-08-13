@@ -4,13 +4,9 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,16 +24,16 @@ public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private PowerDistribution pd;
+  
 
   @Override
   public void robotInit() {
     // Logger.recordMetadata("ProjectName", "Katherine Tchaikovsky Swift");
 
     if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-      pd = new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
+      //Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      //Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+     
       
     } else {
       // setUseTiming(false); // Run as fast as possible
@@ -103,9 +99,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     
-    
-    // System.out.println(RobotContainer.shooter.getTopVelocity() + " : " + RobotContainer.shooter.getBottomVelocity());
-    //System.out.println(Rotation2d.fromDegrees(-RobotContainer.shooterLimelight.getObjectTX() + RobotContainer.shooterLimelight.maxIsStupid().getDegrees()));
+  //  System.out.println(RobotContainer.shooterLimelight.getVerticalToPriorityID());
   }
 
   @Override
@@ -129,11 +123,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void autonomousExit() {
-    //TODO test thouroghly
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-      Rotation2d rot = Rotation2d.fromDegrees(180).minus(RobotContainer.drivetrain.getSwerveDrive().getOdometryHeading());
-      Pose2d pose = new Pose2d(RobotContainer.drivetrain.getSwerveDrive().getPose().getTranslation(), rot);
-      RobotContainer.drivetrain.getSwerveDrive().resetOdometry(pose);
-    }
+    
+    // if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+    //   Rotation2d rot = Rotation2d.fromDegrees(180).minus(RobotContainer.drivetrain.getSwerveDrive().getOdometryHeading());
+    //   Pose2d pose = new Pose2d(RobotContainer.drivetrain.getSwerveDrive().getPose().getTranslation(), rot);
+    //   RobotContainer.drivetrain.getSwerveDrive().resetOdometry(pose);
+    // }
   }
 }

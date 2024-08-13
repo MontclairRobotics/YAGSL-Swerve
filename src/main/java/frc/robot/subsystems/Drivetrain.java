@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -35,20 +36,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.vision.Limelight;
+
 import frc.robot.vision.LimelightHelpers;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.SwerveModule;
@@ -57,12 +56,14 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.FieldCentric;
 
+
 public class Drivetrain extends SubsystemBase {
 
-  private ChassisSpeeds speeds;
+ 
   private final SwerveDrive swerveDrive;
   public final PIDController thetaController;
   Timer timer = new Timer();
@@ -71,11 +72,14 @@ public class Drivetrain extends SubsystemBase {
   Orchestra orchestra;
 
  private boolean isFieldRelative;
+ private ChassisSpeeds velocityFromController;
+
+ private boolean logModuleStates = true;
 
   // private AHRS navX;
 
   public Drivetrain(File directory) {
-
+    velocityFromController = new ChassisSpeeds();
     this.isFieldRelative = true;
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.NONE;
@@ -90,6 +94,7 @@ public class Drivetrain extends SubsystemBase {
 
     SimpleMotorFeedforward ff = new SimpleMotorFeedforward(DriveConstants.DRIVE_KS, DriveConstants.DRIVE_KV, DriveConstants.DRIVE_KA);
     swerveDrive.replaceSwerveModuleFeedforward(ff);
+
 
 
     double kp = swerveDrive.getSwerveController().thetaController.getP();
@@ -110,11 +115,14 @@ public class Drivetrain extends SubsystemBase {
     //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
     //     });
 
+
     // Shuffleboard.getTab("Debug").addDouble("Drivetrain/FrontLeftVoltage", getSwerveDrive().getModules()[0].getDriveMotor()::getVoltage);
     modules = swerveDrive.getModules();
-
+      
     for (int i = 0; i < modules.length; i++) {
       modules[i].getAngleMotor().setMotorBrake(true);
+      //TalonFX driveMotor = (TalonFX) modules[i].getDriveMotor().getMotor();
+      //driveMotor.getConfigurator().apply(DriveConstants.DRIVE_CONFIG);
     }
     // ArrayList<TalonFX> motors = new ArrayList<TalonFX>();
     // motors.add((TalonFX) modules[0].getDriveMotor().getMotor());
@@ -129,6 +137,10 @@ public class Drivetrain extends SubsystemBase {
     // orchestra.loadMusic("nationGood.chrp");
 
 
+
+    getSwerveDrive().getSwerveController().thetaController.setTolerance(DriveConstants.ANGLE_DEADBAND * ((Math.PI ) / 180 ), Units.degreesToRadians(4));
+
+
     // DriveConstants.kp.whenUpdate(getSwerveDrive().getSwerveController().thetaController::setP);
     // DriveConstants.kd.whenUpdate(getSwerveDrive().getSwerveController().thetaController::setD);
     // DriveConstants.ki.whenUpdate(getSwerveDrive().getSwerveController().thetaController::setI);
@@ -139,9 +151,15 @@ public class Drivetrain extends SubsystemBase {
 
     
     // Shuffleboard.getTab("Debug").addDouble("Wrapped Angle", () -> RobotContainer.drivetrain.getWrappedRotation().getDegrees());
-    // Shuffleboard.getTab("Debug").addDouble("Front Left Velocity", () -> {
-    //   return motors.get(0).getVelocity().getValueAsDouble();
-    // });
+    Shuffleboard.getTab("Debug").addDouble("Front Left Velocity", () -> {
+      return swerveDrive.getModules()[0].getDriveMotor().getVelocity();
+    });
+
+
+    // SwerveModuleState[] targetStates = swerveDrive.kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(this.velocityFromController, getWrappedRotation()));
+      
+    //   Logger.recordOutput("Drivetrain/ModuleStates/CurrentStates", targetStates);
+    //   Logger.recordOutput("Drivetrain/ModuleStates/TargetStates", this.swerveDrive.getStates());
     // Shuffleboard.getTab("Debug").addDouble("Front Right Velocity", () -> {
     //   return motors.get(1).getVelocity().getValueAsDouble();
     // });
@@ -197,34 +215,46 @@ public class Drivetrain extends SubsystemBase {
     swerveDrive.drive(translation, rotation, this.isFieldRelative, DriveConstants.IS_OPEN_LOOP);
   }
 
+  
+
   /** Moves chassis */
   public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
 
     swerveDrive.setChassisSpeeds(chassisSpeeds);
   }
 
+
+  // public Translation2d getPoseDifferenceToSpeaker() {
+  //   Pose2d robotPose = getSwerveDrive().getPose();
+  //   Optional<Alliance> alliance = DriverStation.getAlliance();
+  //   double yDiff = (robotPose.getY()-FieldConstants.BLUE_SPEAKER_POSE.getY());
+  //   double xDiff;
+  //   if (alliance.isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+  //     xDiff = (robotPose.getX()-FieldConstants.RED_SPEAKER_POSE.getX());
+  //   } else {
+  //     xDiff = (robotPose.getX()-FieldConstants.BLUE_SPEAKER_POSE.getX());
+  //   }
+  //   return new Translation2d(xDiff, yDiff);
+    
+    
+  // }
+  
+
   /** logs data: module positions, gyro rotation, and pose */
   @Override
   public void periodic() {
-    // Logger.recordOutput("Drivetrain/Module-Positions", getSwerveDrive().getModulePositions());
-    // Logger.recordOutput("Drivetrain/Gyro-Rotation", getSwerveDrive().getGyroRotation3d());
-    // Logger.recordOutput("Drivetrain/Pose", getSwerveDrive().getPose());
     
-    // if (timer.get() >= 0.4) {
-      // System.out.println("FL " + modules[0].getDriveMotor().getVelocity());
-      // System.out.println("FR " + modules[1].getDriveMotor().getVelocity());
-      // System.out.println("BL " + modules[2].getDriveMotor().getVelocity());
-      // System.out.println("FR " + modules[3].getDriveMotor().getVelocity());
-      // timer.reset();
-      // timer.start();
-    // } 
-
-    // Pose2d pose = LimelightHelpers.toPose2D(LimelightHelpers.getBotPose_wpiBlue("limelight-shooter"));
-    // System.out.println(Units.metersToInches(pose.minus(new Pose2d(0, 5.55, new Rotation2d())).getTranslation().getNorm()));
-    // System.out.println(Units.metersToInches(LimelightHelpers.toPose2D(LimelightHelpers.getBotPose_TargetSpace("limelight-shooter")).getTranslation().getNorm()));
-
-    // RobotContainer.field.setRobotPose(swerveDrive.getPose());
-    // System.out.println(swerveDrive.getPose().getX() + " " + swerveDrive.getPose().getY() + " " + swerveDrive.getPose().getRotation().getDegrees());
+    // Logger.recordOutput("Drivetrain/ChassisSpeedsFromController", this.velocityFromController);
+   
+    
+    if (logModuleStates) {
+      SwerveModuleState[] targetStates = swerveDrive.kinematics.toSwerveModuleStates(ChassisSpeeds.fromFieldRelativeSpeeds(this.velocityFromController, getWrappedRotation()));
+      
+      Logger.recordOutput("Drivetrain/ModuleStates/TargetStates", targetStates);
+      Logger.recordOutput("Drivetrain/ModuleStates/CurrentStates", this.swerveDrive.getStates());
+      
+    }
+    
   }
 
   public void addVisionMeasurement(Pose2d pose, double time) {
@@ -234,13 +264,13 @@ public class Drivetrain extends SubsystemBase {
     swerveDrive.addVisionMeasurement(pose, time, visionMeasurementStdDevs);
   }
 
-  /** sets isFieldRelative to either true or false, used for getIsFieldRelative */
+  
   public void setIsFieldRelative(boolean relative) {
     this.isFieldRelative = relative;
   }
 
-  
-  public boolean getIsFieldRelative(boolean relative) {
+  @AutoLogOutput(key = "Drivetrain/isFieldRelative")
+  public boolean getIsFieldRelative() {
     return this.isFieldRelative;
   }
 
@@ -257,26 +287,35 @@ public class Drivetrain extends SubsystemBase {
     this.swerveDrive.resetOdometry(new Pose2d(0.0, 0.0, new Rotation2d(0.0)));
   }
 
-  
+  @AutoLogOutput(key = "Drivetrain/Pose2D")
+  public Pose2d getPose() {
+    return this.swerveDrive.getPose();
+  }
 
-  // @AutoLogOutput
-  /** returns direction */
+  @AutoLogOutput(key = "Drivetrain/RobotVelocity")
+  public ChassisSpeeds getRobotVelocity() {
+    return this.swerveDrive.getRobotVelocity();
+  }
+
+  @AutoLogOutput(key = "Drivetrain/Heading")
   public Rotation2d getRotation() {
 
     return this.swerveDrive.getOdometryHeading();
   }
 
+ 
   public void enableFieldRelative() {
-    System.out.println("Enabled field relative!");
+
     isFieldRelative = true;
   }
 
   public void disableFieldRelative() {
-    System.out.println("Disabled field relative!");
+  
     isFieldRelative = false;
   }
 
   /** Returns angle of the robot between 0 and 360 */
+  @AutoLogOutput(key = "Drivetrain/WrappedHeading")
   public Rotation2d getWrappedRotation() {
     double angle = getRotation().getDegrees() % 360;
     if (angle < 0) angle = 360 + angle;
@@ -291,14 +330,18 @@ public class Drivetrain extends SubsystemBase {
     double xSpeed = -MathUtil.applyDeadband(controller.getLeftX(), 0.05) * DriveConstants.MAX_SPEED;
     double ySpeed = -MathUtil.applyDeadband(controller.getLeftY(), 0.05) * DriveConstants.MAX_SPEED;
 
-    // if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-    //   thetaSpeed *= -1;
-    //   xSpeed *= -1;
-    //   ySpeed *= -1;
-    // }
+
+
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red && isFieldRelative)  {
+     
+       xSpeed *= -1;
+       ySpeed *= -1;
+    }
+
     Translation2d targetTranslation = new Translation2d(ySpeed, xSpeed);
-    // Logger.recordOutput("Drivetrain/Controller-Translation", targetTranslation);
-    // Logger.recordOutput("Drivetrain/Controller-Theta", thetaSpeed);
+
+    // TODO: Converts a translation to a chassisSpeeds, used for advantagekit logging in drivetrain periodic, probably a better way to do it but this is fast and it works.
+    this.velocityFromController = this.isFieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(targetTranslation.getX(), targetTranslation.getY(), thetaSpeed, this.swerveDrive.getOdometryHeading()) : new ChassisSpeeds(targetTranslation.getX(), targetTranslation.getY(), thetaSpeed);
 
     this.drive(targetTranslation, thetaSpeed);
   }
@@ -403,7 +446,7 @@ public class Drivetrain extends SubsystemBase {
                 log.motor("front-left-drive")
                 .voltage(appliedVoltage.mut_replace(frontLeft.getAppliedOutput() * frontLeft.getBusVoltage(), Volts))
                 .linearVelocity(linearVelocity.mut_replace(frontLeft.getEncoder().getVelocity(), MetersPerSecond))
-                .linearPosition(distance.mut_replace(frontLeft.getEncoder().getPosition() * 1 /* TODO ticks to meters */, Meters));
+                .linearPosition(distance.mut_replace(frontLeft.getEncoder().getPosition() * 1, Meters));
 
                 log.motor("front-right-drive")
                 .voltage(appliedVoltage.mut_replace(frontRight.getAppliedOutput() * frontRight.getBusVoltage(), Volts))
@@ -473,6 +516,22 @@ public class Drivetrain extends SubsystemBase {
 
       
       
+    }
+
+    public Rotation2d getSpeakerAngle() {
+      Pose2d t_pose = FieldConstants.RED_SPEAKER_POSE;
+      Pose2d r_pose = this.swerveDrive.getPose();
+
+      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Blue) {
+        t_pose = FieldConstants.BLUE_SPEAKER_POSE;
+      }
+      
+      
+
+      Translation2d t_translation = new Translation2d(t_pose.getX(), t_pose.getY());
+      Translation2d r_translation = new Translation2d(r_pose.getX(), r_pose.getY());
+
+      return r_translation.minus(t_translation).getAngle();
     }
 
 

@@ -1,6 +1,6 @@
 package frc.robot.vision;
 
-public enum DetectionType { // TODO: UPDATE PIPELINES
+public enum DetectionType { 
   DRIVER(-1),
   NOTE(1),
   APRIL_TAG(0);

@@ -12,6 +12,8 @@ import animation2.RaceAnimation;
 import animation2.RainbowAnimation;
 import animation2.WipeTransition;
 import animation2.api.Animation;
+
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -39,6 +41,7 @@ public final class Constants {
     
     public static final Pose2d RED_SPEAKER_POSE = new Pose2d(Units.inchesToMeters(652.3 - SPEAKER_SCORE_X_OFFSET), Units.inchesToMeters(218.42), new Rotation2d());
     public static final Pose2d BLUE_SPEAKER_POSE = new Pose2d(Units.inchesToMeters(-1.5 + SPEAKER_SCORE_X_OFFSET), Units.inchesToMeters(218.42), new Rotation2d());
+    public static final double SPEAKER_SCORE_HEIGHT = Units.inchesToMeters(80.511811);
     
   }
   public static class OperatorConstants {
@@ -51,6 +54,13 @@ public final class Constants {
     public static Tunable<Double> kd = Tunable.of(0, "heading.kd");
     public static Tunable<Double> ki = Tunable.of(0.01, "heading.ki");
 
+
+    public static final double DRIVE_STATOR_CURRENT_LIMIT = 80;
+    public static final double DRIVE_SUPPLY_CURRENT_LIMIT = 80;
+    public static final CurrentLimitsConfigs DRIVE_CONFIG = new CurrentLimitsConfigs()
+      .withStatorCurrentLimitEnable(true)
+      .withStatorCurrentLimit(80);
+      
     public static final double DRIVE_KS = 0.12;
     public static final double DRIVE_KV = 2.8;
     public static final double DRIVE_KA = 0.17;
@@ -61,19 +71,23 @@ public final class Constants {
     public static final boolean IS_OPEN_LOOP = false;
 
     public static final double MAX_VOLTAGE_V = 12.0;
+
+    
+
     public static final double MAX_SPEED = Units.feetToMeters(11);
+
 
     public static final double MAX_ROT_SPEED = 2 * Math.PI;
     // Max Acceleration in M/s^2
-    public static final double MAX_ACCELERATION = 3.0;
+    // public static final double MAX_ACCELERATION = Units.feetToMeters(6);
     // Max angular acceleration in Rad/S^2
-    public static final double MAX_ANGULAR_ACCELERATION = 1.5;
+    // public static final double MAX_ANGULAR_ACCELERATION = 1.5;
 
     public static final double DRIVE_BASE_RADIUS = 0.43;
 
     public static final Pose2d EDGE_OF_DRIVEBASE =
         new Pose2d(0, DRIVE_BASE_RADIUS + BUMPER_WIDTH, new Rotation2d());
-    // TODO: correct angle deadband
+    
     public static final double ANGLE_DEADBAND = 2.5;
   }
 
@@ -87,12 +101,11 @@ public final class Constants {
     public static final double INTAKE_LIMELIGHT_ANGLE_DEGREES = 0;
     public static final double ALIGN_CENTER_OFFSET = 3;
 
-    public static final Matrix<N3, N1> IDEAL_VISION_STD_DEVS = VecBuilder.fill(0.5, 0.5, Double.MAX_VALUE);
-    public static final Matrix<N3, N1> TERRIBLE_VISION_STD_DEVS = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-    public static final double TAG_DISTANCE_CUTOFF = 3.3; // meters
+    public static final Matrix<N3, N1> IDEAL_VISION_STD_DEVS = VecBuilder.fill(0.7, 0.7, Double.MAX_VALUE);
+    public static final double POSE_ANGULAR_VELOCITY_CUTOFF = Units.degreesToRadians(360);
   }
 
-  public static class Ports { // TODO: add correct ports
+  public static class Ports {
     public static final int LED_PWM = 5;
 
     public static final int INTAKE_TOP_MOTOR = 21;
@@ -115,7 +128,7 @@ public final class Constants {
 
     
 
-    public static final int SPROCKET_ABS_ENCODER = 3; //9
+    public static final int SPROCKET_ABS_ENCODER = 2; //9
 
     public static final int CLIMBER_LEFT_LIMIT_SWITCH_PORT = 5;
 
@@ -126,7 +139,7 @@ public final class Constants {
     // Climbers
     public static final double CLIMBER_SPEED = 0.3;
     public static final double MAX_HEIGHT = 18; // Inches
-    public static final double ROTATIONS_PER_INCH = Math.PI/30; //12.0672 * Math.PI; // TODO:
+    public static final double ROTATIONS_PER_INCH = Math.PI/30;
   }
 
   public static class IntakeConstants {
@@ -140,7 +153,7 @@ public final class Constants {
     public static final double MAX_VOLTAGE_V = 12.0;
 
     public static double SOURCE_ANGLE = 61;
-    // TODO: needs to be set
+
     
     public static final boolean SPROCKET_BEAM_INVERT = false;
     
@@ -151,7 +164,7 @@ public final class Constants {
     // public static final Tunable<Double> kV = Tunable.of(8.91, "arm.feedforward.kV");
     // public static final Tunable<Double> kA = Tunable.of(0.01, "arm.feedforward.ka");
 
-    // TODO: Angle PID Constants: (!!!!!!)
+    
     public static final Tunable<Double> angleKP = Tunable.of(0.8, "arm.kp");
     public static final Tunable<Double> angleKI = Tunable.of(0, "arm.ki");
     public static final Tunable<Double> angleKD = Tunable.of(0, "arm.kd");
@@ -161,17 +174,15 @@ public final class Constants {
     public static final double ENCODER_MIN_ANGLE = 26;
     public static final double ENCODER_MAX_ANGLE = 63;
 
-    public static final double SPEAKER_SCORE_ANGLE = 58;
-    public static final double SPEAKER_LOWER_SCORE_ANGLE = 58;
-    public static final double AMP_SCORE_ANGLE = 62;
+    public static final double SPEAKER_SCORE_ANGLE = 58 - 6.5;
+    public static final double AMP_SCORE_ANGLE = 62-6.5; //adjusting for the idk
 
 
     public static final Tunable<Boolean> LEFT_INVERT = Tunable.of(true, "arm.invert.left");
     public static final Tunable<Boolean> RIGHT_INVERT = Tunable.of(true, "arm.invert.right");
 
 
-    // Sprocket
-    // TODO: Validate values
+
     public static final double SPROCKET_ANGLE_MOVE_SPEED = 0.5;
     public static final double SPROCKET_ANGLE_DEADBAND = 2;
     public static final double SPROCKET_ANGLE_LIMIT_DEADBAND = 2;
@@ -181,14 +192,9 @@ public final class Constants {
 
     
     public static final double MAX_SPEED = 0.5;
-    public static final double INTAKE_ANGLE = 52;
-    // First number in meters, second in degrees
-    public static final Point2D.Double[] ANGLE_POINTS = {
-      new Point2D.Double(0, 0) // example
-    };
-
-    // First number in meters, second in RPM
-    public static final Point2D.Double[] SPEED_POINTS = {};
+    public static final double INTAKE_ANGLE = 40;
+    public static final double OUTTAKE_ANGLE = 35;
+    
   }
     
   
@@ -265,7 +271,7 @@ public final class Constants {
     public static final char[] ALL_POINTS = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', '1', '2', '3', '4'};
     public static final char[] STARTING_POINTS = {'1', '2', '3', '4'};
     
-    public static final Pose2d POSE_1 = new Pose2d(0.68, 4.38, Rotation2d.fromDegrees(-59.50)); //TODO check angles
+    public static final Pose2d POSE_1 = new Pose2d(0.68, 4.38, Rotation2d.fromDegrees(-59.50)); 
     public static final Pose2d POSE_2 = new Pose2d(1.37, 5.55, Rotation2d.fromDegrees(0));
     public static final Pose2d POSE_3 = new Pose2d(0.72, 6.72, Rotation2d.fromDegrees(59.50));
     public static final Pose2d POSE_4 = new Pose2d(1.82, 7.23, Rotation2d.fromDegrees(-90.00));
@@ -288,10 +294,10 @@ public final class Constants {
             DriveConstants.DRIVE_BASE_RADIUS,
             new ReplanningConfig());
 
-    public static final PathConstraints PATH_CONSTRAINTS =
-        new PathConstraints(
-            DriveConstants.MAX_SPEED, DriveConstants.MAX_ACCELERATION,
-            DriveConstants.MAX_ROT_SPEED, DriveConstants.MAX_ANGULAR_ACCELERATION);
+    // public static final PathConstraints PATH_CONSTRAINTS =
+    //     new PathConstraints(
+    //         DriveConstants.MAX_SPEED, DriveConstants.MAX_ACCELERATION,
+    //         DriveConstants.MAX_ROT_SPEED, DriveConstants.MAX_ANGULAR_ACCELERATION);
 
     public static final double GOAL_END_VELOCITY = 0.0;
     public static final double ROTATION_DELAY_DISTANCE = 0.0;
