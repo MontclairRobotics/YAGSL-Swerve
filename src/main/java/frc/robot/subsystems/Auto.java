@@ -27,6 +27,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -64,7 +65,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Auto extends SubsystemBase {
 
-  private SendableChooser<Command> autoChooser;
+  public SendableChooser<Command> autoChooser;
 
   public Auto() {
     
@@ -81,6 +82,7 @@ public class Auto extends SubsystemBase {
     autoChooser = AutoBuilder.buildAutoChooser(); 
     autoChooser.setDefaultOption("Preloaded Only", Commands555.scoreSubwoofer());
     Shuffleboard.getTab("Auto").add("Auto Chooser", autoChooser);
+    
 
   }
 
@@ -95,6 +97,7 @@ public class Auto extends SubsystemBase {
     NamedCommands.registerCommand("AlignAndShoot", Commands555.alignAndShootAuto());
     NamedCommands.registerCommand("LoadNote", Commands555.loadNote());
     NamedCommands.registerCommand("ScoreSubwoofer", Commands555.scoreSubwoofer());
+    NamedCommands.registerCommand("SpinupShooter", Commands555.spinUpShooter(ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.SPEAKER_EJECT_SPEED));
   }
 
   private void setupPathPlanner() {

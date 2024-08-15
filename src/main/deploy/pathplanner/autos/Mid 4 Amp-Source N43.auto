@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7070891857147217,
-      "y": 6.776917934417725
+      "x": 1.3703281879425049,
+      "y": 5.55
     },
-    "rotation": 59.93139976160897
+    "rotation": 4.4571783787743066e-29
   },
   "command": {
     "type": "sequential",
@@ -18,14 +18,14 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "SpinupShooter"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "ScoreSubwoofer"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinupShooter"
+                }
               }
             ]
           }
@@ -37,7 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Amp-NAmp"
+                  "pathName": "Mid-NAmp"
                 }
               },
               {
@@ -52,7 +52,32 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NAmp-AmpPillar"
+            "pathName": "NAmp-AmpScore.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpScore-NMid"
+                }
+              }
+            ]
           }
         },
         {
@@ -68,7 +93,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AmpPillar-N1"
+                  "pathName": "NMid-NSource"
                 }
               },
               {
@@ -83,7 +108,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N1-AmpPillar.1"
+            "pathName": "NSource-SourcePillar"
           }
         },
         {
@@ -97,15 +122,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "AmpPillar-N2.1"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "LoadNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "SourcePillar-N4"
                 }
               }
             ]
@@ -114,7 +139,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N2-AmpPillar.1"
+            "pathName": "N4-7"
           }
         },
         {
@@ -128,15 +153,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "AmpPillar-N3"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "LoadNote"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "7-N3"
                 }
               }
             ]
@@ -152,6 +177,19 @@
           "type": "named",
           "data": {
             "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "7-N1"
+                }
+              }
+            ]
           }
         }
       ]

@@ -2,29 +2,42 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3703281879425047,
+      "x": 1.370328187942505,
       "y": 5.55
     },
-    "rotation": 4.302277998743228e-26
+    "rotation": 4.3173366328218174e-29
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ScoreSubwoofer"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ScoreSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinupShooter"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Mid-NAmp"
+                  "pathName": "Mid-NSource"
                 }
               },
               {
@@ -39,7 +52,94 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NAmp-AmpScore.1"
+            "pathName": "NSource-SourceScore.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "SourceScore-NMid.1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "NMid-NAmp"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NAmp-AmpPillar"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpPillar-N3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N3-AmpPillar.1"
           }
         },
         {
@@ -61,10 +161,16 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AmpScore-NMid"
+                  "pathName": "AmpPillar-N2.1"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N2-AmpPillar.1"
           }
         },
         {
@@ -80,7 +186,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "NMid-NSource"
+                  "pathName": "AmpPillar-N1"
                 }
               },
               {
@@ -90,55 +196,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NSource-SourceScore"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignAndShoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "SourceScore-SourcePillar"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "LoadNote"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "SourcePillar-N4"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "N4-SourcePillar"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignAndShoot"
           }
         }
       ]

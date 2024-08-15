@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-
+import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -66,14 +67,14 @@ public class RobotContainer {
   public static Climbers climbers = new Climbers();
   
 
-  public static final Field2d field = new Field2d();
+  public static Field2d field = new Field2d();
 
   
-
+  
   public static boolean isDriverMode = false;
 
   public RobotContainer() {
-
+    SmartDashboard.putData(field);
     auto.setup();
     
 

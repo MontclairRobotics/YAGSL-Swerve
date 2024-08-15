@@ -1,20 +1,31 @@
 {
-  "HALProvider": {
-    "Other Devices": {
-      "Talon FX (v6)[6]/Rotor Sensor": {
-        "header": {
-          "open": true
-        }
-      }
-    }
-  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Auto/Auto Chooser": "String Chooser",
       "/Shuffleboard/Auto/Field": "Field2d",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Pigeon 2 (v6) [25]": "Gyro",
       "/SmartDashboard/Pigeon 2 (v6) [50]": "Gyro",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Pigeon 2 (v6) [25]": {
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
@@ -23,6 +34,18 @@
         "Auto": {
           "open": true
         },
+        "open": true
+      },
+      "SmartDashboard": {
+        "Swerve Drive": {
+          "open": true
+        },
+        "open": true
+      },
+      "Tuning": {
+        "open": true
+      },
+      "limelight-shooter": {
         "open": true
       }
     }
@@ -38,5 +61,23 @@
       "open": true
     },
     "visible": true
+  },
+  "Plot": {
+    "Plot <0>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 326
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    }
   }
 }

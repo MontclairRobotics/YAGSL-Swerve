@@ -2,50 +2,32 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3703281879425042,
-      "y": 5.55
+      "x": 0.7070891857147217,
+      "y": 6.776917934417725
     },
-    "rotation": 4.148446913226005e-26
+    "rotation": 59.93139976160897
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "ScoreSubwoofer"
-          }
-        },
-        {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "Mid-NSource"
+                  "name": "SpinupShooter"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LoadNote"
+                  "name": "ScoreSubwoofer"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NSource-SourceScore.1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignAndShoot"
           }
         },
         {
@@ -55,32 +37,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "SourceScore-NMid.1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "LoadNote"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignAndShoot"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "NMid-NAmp"
+                  "pathName": "Amp-NAmp"
                 }
               },
               {
@@ -111,6 +68,68 @@
               {
                 "type": "path",
                 "data": {
+                  "pathName": "AmpPillar-N2.1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N2-AmpPillar.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "AmpPillar-N1"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N1-AmpPillar.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
                   "pathName": "AmpPillar-N3"
                 }
               },
@@ -126,7 +145,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N3-AmpPillar.1"
+            "pathName": "N3-7"
           }
         },
         {

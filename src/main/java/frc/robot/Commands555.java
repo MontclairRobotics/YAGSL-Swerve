@@ -653,7 +653,11 @@ public class Commands555 {
   public static Command alignAndShootAuto() {
     return Commands.sequence(
       setSprocketAngleWithStop(RobotContainer.shooterLimelight::bestFit),
-      Commands555.shoot(ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.SPEAKER_EJECT_SPEED, ShooterConstants.TRANSPORT_SPEED));
+      Commands555.transport(1),
+      Commands555.waitForTime(0.15),
+      Commands.runOnce(() -> {
+        RobotContainer.shooter.stopTransport();
+      }, RobotContainer.shooter));
     
   }
 
@@ -1022,6 +1026,25 @@ public class Commands555 {
         setSprocketAngle(ArmConstants.INTAKE_ANGLE)
         );
   }
+
+
+  public static Command scoreSubwooferAuto() { // used because the shooter wheels are already spinning!
+    return Commands.sequence(
+        Commands.runOnce(() -> System.out.println("Scoring subwoofer!")),
+        setSprocketAngle(ArmConstants.SPEAKER_SCORE_ANGLE),
+        waitUntil(() -> {
+          return RobotContainer.sprocket.isAtAngle();
+        }),
+        Commands.waitUntil(() -> {return RobotContainer.shooter.getBottomVelocity() > 2000;}),
+        Commands555.transport(1),
+        Commands555.waitForTime(0.4),
+        Commands555.stopTransport()
+        
+        
+    );
+  }
+
+  
 
   // public static Command scoreSubwooferAtAngle() {
   //   return Commands.sequence(

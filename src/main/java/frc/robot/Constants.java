@@ -76,7 +76,7 @@ public final class Constants {
 
     
 
-    public static final double MAX_SPEED = Units.feetToMeters(11);
+    public static final double MAX_SPEED = Units.feetToMeters(10.944);
 
 
     public static final double MAX_ROT_SPEED = 2 * Math.PI;
@@ -213,6 +213,7 @@ public final class Constants {
     public static Tunable<Double> ki = Tunable.of(0, "shooter.ki");
     public static Tunable<Double> kd = Tunable.of(0, "shooter.kd");
     public static Tunable<Double> ff = Tunable.of(0.0, "shooter.ff");
+    public static double transportSpeed;
 
     public static final double MAX_RPM = 5700;
 
@@ -293,7 +294,7 @@ public final class Constants {
             TRANSLATION_PID_CONSTANTS,
             ANGULAR_PID_CONSTANTS,
             DriveConstants.MAX_SPEED,
-            DriveConstants.DRIVE_BASE_RADIUS,
+            DriveConstants.DRIVE_BASE_RADIUS, // TODO: (CHOREO) pp docs says this is from the center of the robot to the furthest module, which this is not.
             new ReplanningConfig());
 
     // public static final PathConstraints PATH_CONSTRAINTS =

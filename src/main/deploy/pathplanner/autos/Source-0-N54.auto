@@ -12,13 +12,26 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ScoreSubwoofer"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "ScoreSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinupShooter"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -49,7 +62,7 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
               {
@@ -70,7 +83,38 @@
         {
           "type": "path",
           "data": {
-            "pathName": "N4-SourcePillar"
+            "pathName": "N4-7.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "7-N3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "LoadNote"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "N3-7"
           }
         },
         {
