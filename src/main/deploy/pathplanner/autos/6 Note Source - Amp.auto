@@ -5,7 +5,7 @@
       "x": 1.3283064365386963,
       "y": 5.55
     },
-    "rotation": 1.6437089596865365e-25
+    "rotation": 1.727324143612614e-26
   },
   "command": {
     "type": "sequential",
@@ -85,6 +85,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Source-Amp N32.7"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "AlignAndShoot"
@@ -93,7 +99,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "6 Note Source-Amp N32.7"
+            "pathName": "6 Note Source-Amp N32.8"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Source-Amp N32.9"
           }
         },
         {
