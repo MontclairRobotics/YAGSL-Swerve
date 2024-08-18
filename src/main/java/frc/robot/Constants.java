@@ -60,7 +60,7 @@ public final class Constants {
     public static final CurrentLimitsConfigs DRIVE_CURRENT_CONFIG = new CurrentLimitsConfigs()
       .withStatorCurrentLimitEnable(true)
       .withStatorCurrentLimit(DRIVE_STATOR_CURRENT_LIMIT)
-      .withSupplyCurrentLimitEnable(false)
+      .withSupplyCurrentLimitEnable(false);
       
       
     public static final double DRIVE_KS = 0.12;
