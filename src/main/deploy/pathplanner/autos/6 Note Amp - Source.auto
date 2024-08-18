@@ -1,0 +1,122 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3283064365386963,
+      "y": 5.55
+    },
+    "rotation": -6.466256642665055e-26
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpinupShooter"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ScoreSubwoofer"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.7"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.8"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 Note Amp-Source N23.9"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}
