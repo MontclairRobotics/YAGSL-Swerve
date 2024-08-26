@@ -37,12 +37,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "AlignAndShoot"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Source N543.2"
@@ -58,6 +52,30 @@
           "type": "path",
           "data": {
             "pathName": "Source N543.3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source N543.4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AlignAndShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source N543.5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source N543.6"
           }
         },
         {
