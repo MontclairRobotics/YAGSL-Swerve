@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -65,7 +64,6 @@ public class Drivetrain extends SubsystemBase {
 
  
   private final SwerveDrive swerveDrive;
-  public final PIDController thetaController;
   Timer timer = new Timer();
 
   SwerveModule[] modules;
@@ -95,27 +93,6 @@ public class Drivetrain extends SubsystemBase {
     SimpleMotorFeedforward ff = new SimpleMotorFeedforward(DriveConstants.DRIVE_KS, DriveConstants.DRIVE_KV, DriveConstants.DRIVE_KA);
     swerveDrive.replaceSwerveModuleFeedforward(ff);
 
-
-
-    double kp = swerveDrive.getSwerveController().thetaController.getP();
-    double ki = swerveDrive.getSwerveController().thetaController.getI();
-    double kd = swerveDrive.getSwerveController().thetaController.getD();
-    thetaController = new PIDController(kp, ki, kd);
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    thetaController.setTolerance(DriveConstants.ANGLE_DEADBAND * ((Math.PI ) / 180 ), DriveConstants.VELOCITY_DEADBAND * ((Math.PI ) / 180 ));
-    // PathPlannerLogging.setLogActivePathCallback(
-    //     (activePath) -> {
-    //       Logger.recordOutput(
-    //           "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
-    //     });
-    // PathPlannerLogging.setLogTargetPoseCallback(
-    //     (targetPose) -> {
-    //       Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
-    //     });
-
-
     // Shuffleboard.getTab("Debug").addDouble("Drivetrain/FrontLeftVoltage", getSwerveDrive().getModules()[0].getDriveMotor()::getVoltage);
     modules = swerveDrive.getModules();
       
@@ -137,9 +114,7 @@ public class Drivetrain extends SubsystemBase {
     // orchestra.loadMusic("nationGood.chrp");
 
 
-
     getSwerveDrive().getSwerveController().thetaController.setTolerance(DriveConstants.ANGLE_DEADBAND * ((Math.PI ) / 180 ), Units.degreesToRadians(4));
-
 
     // DriveConstants.kp.whenUpdate(getSwerveDrive().getSwerveController().thetaController::setP);
     // DriveConstants.kd.whenUpdate(getSwerveDrive().getSwerveController().thetaController::setD);
@@ -171,10 +146,6 @@ public class Drivetrain extends SubsystemBase {
     // });
 
     
-  }
-
-  public double calculateVelocityForHeading(Rotation2d targetHeading) {
-    return thetaController.calculate(getWrappedRotation().getRadians(), targetHeading.getRadians());
   }
 
   public static boolean angleDeadband(Rotation2d angle1, Rotation2d angle2, Rotation2d deadband) {

@@ -5,15 +5,8 @@
 package frc.robot;
 
 import java.io.File;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
-
-
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
-
 
 import animation2.AllianceAnimation;
 
@@ -62,7 +55,6 @@ public class RobotContainer {
   public static Limelight intakeLimelight = new Limelight("limelight-intake", DetectionType.NOTE);
   public static Limelight shooterLimelight = new Limelight("limelight-shooter", DetectionType.APRIL_TAG);
   public static Auto auto = new Auto();
-
   public static Climbers climbers = new Climbers();
   
 
@@ -74,9 +66,9 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    auto.setup();
-    
-
+    auto.setupPathPlanner();
+    auto.setupAutoTab();
+    setupDriverTab();
     
     Shuffleboard.getTab("Debug").addDouble("Distance", () -> {return shooterLimelight.getDistanceToSpeaker();});
 
