@@ -86,7 +86,6 @@ public class Auto extends SubsystemBase {
 
   }
 
-
   public void setup() {
     setupPathPlanner();
     registerNamedCommands();
@@ -132,8 +131,6 @@ public class Auto extends SubsystemBase {
           Logger.recordOutput("Auto/TargetPose", targetPose);
         });
   }
-
-
 }
   
 
