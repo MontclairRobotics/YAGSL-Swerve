@@ -76,6 +76,7 @@ public class RobotContainer {
   public RobotContainer() {
     SmartDashboard.putData(field);
     auto.setup();
+    setupDriverTab();
     
 
     
@@ -117,6 +118,7 @@ public class RobotContainer {
 
     configureDriverBindings();
     configureOperatorBindings();
+    
 
   }
 

@@ -122,6 +122,7 @@ public class Drivetrain extends SubsystemBase {
       
     for (int i = 0; i < modules.length; i++) {
       modules[i].getAngleMotor().setMotorBrake(true);
+      modules[i].getDriveMotor().setMotorBrake(true);
       TalonFX driveMotor = (TalonFX) modules[i].getDriveMotor().getMotor();
       driveMotor.getConfigurator().apply(DriveConstants.DRIVE_CURRENT_CONFIG);
     }
