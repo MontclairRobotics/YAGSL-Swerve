@@ -38,14 +38,6 @@ public final class Constants {
   public static class FieldConstants {
     public static final double SPEAKER_SCORE_X_OFFSET = 6.0;
     
-    
-    public static final Pose2d RED_SPEAKER_POSE = new Pose2d(Units.inchesToMeters(652.3 - SPEAKER_SCORE_X_OFFSET), Units.inchesToMeters(218.42), new Rotation2d());
-    public static final Pose2d BLUE_SPEAKER_POSE = new Pose2d(Units.inchesToMeters(-1.5 + SPEAKER_SCORE_X_OFFSET), Units.inchesToMeters(218.42), new Rotation2d());
-    public static final double SPEAKER_SCORE_HEIGHT = Units.inchesToMeters(80.511811);
-    
-  }
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
   }
 
   public static class DriveConstants {

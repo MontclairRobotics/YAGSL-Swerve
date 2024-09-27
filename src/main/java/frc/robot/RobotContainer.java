@@ -10,11 +10,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
-
-
 import animation2.AllianceAnimation;
 
 import animation2.api.Animation;
