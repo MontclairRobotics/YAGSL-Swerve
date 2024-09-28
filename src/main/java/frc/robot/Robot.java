@@ -53,6 +53,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     RobotContainer.field.setRobotPose(RobotContainer.drivetrain.getPose());
+    System.out.println(RobotContainer.drivetrain.getWrappedRotation());
     
   }
 

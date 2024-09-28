@@ -239,7 +239,7 @@ System.out.println(distance + " " + distanceNorm + " " + Math.acos(distance / di
         LimelightHelpers.setPriorityTagID(cameraName, 4); //4
         priorityId = 4;
       } else {
-        LimelightHelpers.setPriorityTagID(cameraName, 7);
+        LimelightHelpers.setPriorityTagID(cameraName, 8);
         priorityId = 7;
       }
     }
