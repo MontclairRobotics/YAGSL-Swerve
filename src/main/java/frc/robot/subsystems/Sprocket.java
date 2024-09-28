@@ -33,7 +33,7 @@ import frc.robot.Constants.*;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Sprocket extends SubsystemBase {
-
+  public double sprocket_offset = -49.2;
   private final CANSparkMax leftMotor =
       new CANSparkMax(Ports.LEFT_ANGLE_MOTOR, MotorType.kBrushless);
   private final CANSparkMax rightMotor =
@@ -174,7 +174,7 @@ public class Sprocket extends SubsystemBase {
 
   @AutoLogOutput(key = "Sprocket/EncoderRawAngle")
   public double getRawPosition() {
-    return ((absEncoder.getDistance())-49.2); //* ((double) 14/64)) + 79;//76;
+    return ((absEncoder.getDistance())-sprocket_offset); //* ((double) 14/64)) + 79;//76;
   }
 
   @AutoLogOutput(key = "Sprocket/IsAtAngle")

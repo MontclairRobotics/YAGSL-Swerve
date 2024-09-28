@@ -221,7 +221,8 @@ public class RobotContainer {
     operatorController.circle().and(() -> isDriverMode).whileTrue(Commands555.runTransportManual());
     
 
-
+    operatorController.povLeft().onTrue(Commands.runOnce(() -> {sprocket.sprocket_offset-=1;}, RobotContainer.shooter));
+    operatorController.povRight().onTrue(Commands.runOnce(() -> {sprocket.sprocket_offset+=1;}, RobotContainer.shooter));
   }
 
   public static Animation getTeleopDefaultAnim() {
