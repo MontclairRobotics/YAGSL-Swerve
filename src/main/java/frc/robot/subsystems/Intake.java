@@ -1,7 +1,13 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+
+
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.*;
@@ -9,18 +15,25 @@ import frc.robot.Constants.*;
 
 public class Intake extends SubsystemBase {
 
-  private final CANSparkMax topMotor =
-      new CANSparkMax(Ports.INTAKE_TOP_MOTOR, MotorType.kBrushless);
-  private final CANSparkMax bottomMotor =
-      new CANSparkMax(Ports.INTAKE_BOTTOM_MOTOR, MotorType.kBrushless);
+  private final SparkMax topMotor =
+      new SparkMax(Ports.INTAKE_TOP_MOTOR, MotorType.kBrushless);
+  private final SparkMax bottomMotor =
+      new SparkMax(Ports.INTAKE_BOTTOM_MOTOR, MotorType.kBrushless);
   
   
  
 
   public Intake() {
-    topMotor.setInverted(true);
-    bottomMotor.setInverted(true);
-   
+
+    SparkMaxConfig config = new SparkMaxConfig();
+    config
+      .inverted(true)
+      .idleMode(IdleMode.kCoast);
+    
+    topMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    bottomMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
   }
 
   /** Accelerates motors to intake something */
@@ -46,16 +59,7 @@ public class Intake extends SubsystemBase {
   
   @Override
   public void periodic() {
-    // if (getSensor()) {
-    //   hasPickedUpNote = true;
-    //   timeSinceNote.reset();
-    //   timeSinceNote.start();
-    // }
 
-    // if (timeSinceNote.get() > 5) {
-    //   hasPickedUpNote = false;
-    //   timeSinceNote.stop();
-    // }
   }
 
   public void teleopInit() {

@@ -6,7 +6,6 @@ package frc.robot;
 
 import java.io.File;
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
 import animation2.AllianceAnimation;
 
@@ -79,6 +78,8 @@ public class RobotContainer {
             },
             drivetrain));
 
+    // This is a default command. It runs whenever nothing else is using the subsystem, and
+    // takes manual input.
     sprocket.setDefaultCommand(
         Commands.run(
             () -> {

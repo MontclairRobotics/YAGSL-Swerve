@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -19,12 +19,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 import static edu.wpi.first.units.Units.*;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -57,7 +62,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest.FieldCentric;
 
 
 public class Drivetrain extends SubsystemBase {
@@ -148,6 +152,20 @@ public class Drivetrain extends SubsystemBase {
     
   }
 
+  //From GeometryUtils last year
+  public static Rotation2d flipFieldRotation(Rotation2d rotation) {
+    return new Rotation2d(Math.PI).minus(rotation);
+  }
+
+  public static Translation2d flipFieldPosition(Translation2d pos) {
+    return new Translation2d(16.54 - pos.getX(), pos.getY()); //field length is 16.54
+  }
+
+  public static Pose2d flipFieldPose(Pose2d pose) {
+    return new Pose2d(
+        flipFieldPosition(pose.getTranslation()), flipFieldRotation(pose.getRotation()));
+  }
+
   public static boolean angleDeadband(Rotation2d angle1, Rotation2d angle2, Rotation2d deadband) {
     double degrees1 = wrapRotation(angle1).getDegrees();
     double degrees2 = wrapRotation(angle2).getDegrees();
@@ -158,7 +176,7 @@ public class Drivetrain extends SubsystemBase {
 
   public static Rotation2d flipAngle(Rotation2d angle) {
     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-      return GeometryUtil.flipFieldRotation(angle);
+      return flipFieldRotation(angle);
     }
     return angle;
   }
@@ -319,19 +337,19 @@ public class Drivetrain extends SubsystemBase {
 
   public SysIdRoutine getSysIdAngle() {
 
-        MutableMeasure<Voltage> appliedVoltage = MutableMeasure.mutable(Volts.of(0));
-        MutableMeasure<Angle> rotations = MutableMeasure.mutable(Rotations.of(0));
-        MutableMeasure<Velocity<Angle>> motorVelocity = MutableMeasure.mutable(RotationsPerSecond.of(0));
+        MutVoltage appliedVoltage = Volts.mutable(0);
+        MutAngle rotations = Rotations.mutable(0);
+        MutAngularVelocity motorVelocity = RotationsPerSecond.mutable(0);
 
         SwerveModule[] modules = swerveDrive.getModules();
-        CANSparkMax frontLeft = (CANSparkMax) modules[0].getAngleMotor().getMotor();
-        CANSparkMax frontRight = (CANSparkMax) modules[1].getAngleMotor().getMotor();
-        CANSparkMax backLeft = (CANSparkMax) modules[2].getAngleMotor().getMotor();
-        CANSparkMax backRight = (CANSparkMax) modules[3].getAngleMotor().getMotor();
+        SparkMax frontLeft = (SparkMax) modules[0].getAngleMotor().getMotor();
+        SparkMax frontRight = (SparkMax) modules[1].getAngleMotor().getMotor();
+        SparkMax backLeft = (SparkMax) modules[2].getAngleMotor().getMotor();
+        SparkMax backRight = (SparkMax) modules[3].getAngleMotor().getMotor();
 
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            new SysIdRoutine.Mechanism((Voltage volts) -> {
                 frontLeft.setVoltage(volts.in(Volts));
                 frontRight.setVoltage(volts.in(Volts));
                 backLeft.setVoltage(volts.in(Volts));
@@ -394,20 +412,20 @@ public class Drivetrain extends SubsystemBase {
     }
     
     public SysIdRoutine getSysIdDrive() {
-        MutableMeasure<Voltage> appliedVoltage = MutableMeasure.mutable(Volts.of(0));
-        MutableMeasure<Distance> distance = MutableMeasure.mutable(Meters.of(0));
-        MutableMeasure<Velocity<Distance>> linearVelocity = MutableMeasure.mutable(MetersPerSecond.of(0));
+        MutVoltage appliedVoltage = Volts.mutable(0);
+        MutDistance distance = Meters.mutable(0);
+        MutLinearVelocity linearVelocity = MetersPerSecond.mutable(0);
 
 
         SwerveModule[] modules = swerveDrive.getModules();
-        CANSparkMax frontLeft = (CANSparkMax) modules[0].getDriveMotor().getMotor();
-        CANSparkMax frontRight = (CANSparkMax) modules[1].getDriveMotor().getMotor();
-        CANSparkMax backLeft = (CANSparkMax) modules[2].getDriveMotor().getMotor();
-        CANSparkMax backRight = (CANSparkMax) modules[3].getDriveMotor().getMotor();
+        SparkMax frontLeft = (SparkMax) modules[0].getDriveMotor().getMotor();
+        SparkMax frontRight = (SparkMax) modules[1].getDriveMotor().getMotor();
+        SparkMax backLeft = (SparkMax) modules[2].getDriveMotor().getMotor();
+        SparkMax backRight = (SparkMax) modules[3].getDriveMotor().getMotor();
 
         SysIdRoutine routine = new SysIdRoutine(
             new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            new SysIdRoutine.Mechanism((Voltage volts) -> {
                 frontLeft.setVoltage(volts.in(Volts));
                 frontRight.setVoltage(volts.in(Volts));
                 backLeft.setVoltage(volts.in(Volts));

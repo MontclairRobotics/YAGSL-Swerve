@@ -15,10 +15,7 @@ import animation2.api.Animation;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.util.GeometryUtil;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -29,6 +26,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.Tunable;
 import java.awt.geom.Point2D;
 
@@ -270,23 +268,11 @@ public final class Constants {
     public static final Pose2d POSE_3 = new Pose2d(0.72, 6.72, Rotation2d.fromDegrees(59.50));
     public static final Pose2d POSE_4 = new Pose2d(1.82, 7.23, Rotation2d.fromDegrees(-90.00));
 
-    public static final Pose2d POSE_1_RED = GeometryUtil.flipFieldPose(POSE_1);
-    public static final Pose2d POSE_2_RED = GeometryUtil.flipFieldPose(POSE_2);
-    public static final Pose2d POSE_3_RED = GeometryUtil.flipFieldPose(POSE_3);
-    public static final Pose2d POSE_4_RED = GeometryUtil.flipFieldPose(POSE_4);
-        
-
-
-    public static final PIDConstants ANGULAR_PID_CONSTANTS = new PIDConstants(5.0, 0.0, 0.0);
-    public static final PIDConstants TRANSLATION_PID_CONSTANTS = new PIDConstants(5, 0.0, 0);
-
-    public static final HolonomicPathFollowerConfig PATH_FOLLOWER_CONFIG =
-        new HolonomicPathFollowerConfig(
-            TRANSLATION_PID_CONSTANTS,
-            ANGULAR_PID_CONSTANTS,
-            DriveConstants.MAX_SPEED,
-            DriveConstants.DRIVE_BASE_RADIUS,
-            new ReplanningConfig());
+    public static final Pose2d POSE_1_RED = Drivetrain.flipFieldPose(POSE_1);
+    public static final Pose2d POSE_2_RED = Drivetrain.flipFieldPose(POSE_2);
+    public static final Pose2d POSE_3_RED = Drivetrain.flipFieldPose(POSE_3);
+    public static final Pose2d POSE_4_RED = Drivetrain.flipFieldPose(POSE_4);
+  
 
     // public static final PathConstraints PATH_CONSTRAINTS =
     //     new PathConstraints(

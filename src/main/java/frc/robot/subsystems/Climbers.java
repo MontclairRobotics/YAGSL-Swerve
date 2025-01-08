@@ -1,9 +1,13 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -12,8 +16,8 @@ import frc.robot.Constants.*;
 import frc.robot.util.LimitSwitch;
 
 public class Climbers extends SubsystemBase {
-  private final CANSparkMax leftMotor;
-  private final CANSparkMax rightMotor;
+  private final SparkMax leftMotor;
+  private final SparkMax rightMotor;
 
   private final LimitSwitch leftLimit;
   private final LimitSwitch rightLimit;
@@ -33,15 +37,26 @@ public class Climbers extends SubsystemBase {
 
   /** Creates objects for the motors, limits, and encoders Then sets the encoders */
   public Climbers() {
-    leftMotor = new CANSparkMax(Ports.CLIMBER_LEFT_MOTOR, MotorType.kBrushless);
-    rightMotor = new CANSparkMax(Ports.CLIMBER_RIGHT_MOTOR, MotorType.kBrushless);
+    leftMotor = new SparkMax(Ports.CLIMBER_LEFT_MOTOR, MotorType.kBrushless);
+    rightMotor = new SparkMax(Ports.CLIMBER_RIGHT_MOTOR, MotorType.kBrushless);
 
-    leftMotor.setIdleMode(IdleMode.kBrake);
-    rightMotor.setIdleMode(IdleMode.kBrake);
+    SparkMaxConfig leftConfig = new SparkMaxConfig();
+    leftConfig
+      .inverted(true)
+      .idleMode(IdleMode.kBrake);
+    
+    leftMotor.configure(leftConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
+    SparkMaxConfig rightConfig = new SparkMaxConfig();
+    rightConfig
+      .inverted(false)
+      .idleMode(IdleMode.kBrake);
+    
+    rightMotor.configure(rightConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     leftLimit = new LimitSwitch(Ports.CLIMBER_LEFT_LIMIT_SWITCH_PORT, true);
     rightLimit = new LimitSwitch(Ports.CLIMBER_RIGHT_LIMIT_SWITCH_PORT, true);
-    leftMotor.setInverted(true);
-    rightMotor.setInverted(false);
+
     leftEncoder = leftMotor.getEncoder();
     rightEncoder = rightMotor.getEncoder();
 

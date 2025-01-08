@@ -1,9 +1,14 @@
 package frc.robot.subsystems;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.path.PathPlannerTrajectory;
+
 import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import com.pathplanner.lib.util.GeometryUtil;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
@@ -82,18 +87,28 @@ public class Auto extends SubsystemBase {
   }
 
   public void setupPathPlanner() {
-    AutoBuilder.configureHolonomic(
+    RobotConfig config = null; //again this is dumb as shit don't do this
+    try {
+      config = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    AutoBuilder.configure(
         RobotContainer.drivetrain.getSwerveDrive()::getPose, // Robot pose supplier
         RobotContainer.drivetrain.getSwerveDrive()
             ::resetOdometry, // Method to reset odometry (will be called if your auto has a starting
         // pose)
         RobotContainer.drivetrain.getSwerveDrive()
             ::getRobotVelocity, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        (ChassisSpeeds x) -> {
+        (x, ff) -> { //x is speeds, ff is feedforward which we don't use atm
           RobotContainer.drivetrain.getSwerveDrive().drive(new ChassisSpeeds(x.vxMetersPerSecond, x.vyMetersPerSecond, x.omegaRadiansPerSecond), DriveConstants.IS_OPEN_LOOP, new Translation2d());
         }, // Method that will drive the robot given ROBOT RELATIVE, // Method that will drive the robot given ROBOT RELATIVE
         // ChassisSpeeds
-        Constants.AutoConstants.PATH_FOLLOWER_CONFIG,
+        new PPHolonomicDriveController(
+          new PIDConstants(5, 0, 0),
+          new PIDConstants(5, 0, 0)
+        ),
+        config,
         () -> {
           Optional<Alliance> alliance = DriverStation.getAlliance();
           return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
@@ -130,61 +145,62 @@ public class Auto extends SubsystemBase {
       if (Array555.indexOf(Constants.AutoConstants.NOTES, char1) != -1
           && Array555.indexOf(Constants.AutoConstants.NOTES, char2) != -1) {
         setFeedback("Don't go from a note to a note.");
-        clearAll();
+        // clearAll();
         return false;
       }
       // Checks if there are two scoring spots in a row (not good)
       if (Array555.indexOf(Constants.AutoConstants.SCORING_LOCATIONS, char1) != -1
           && Array555.indexOf(Constants.AutoConstants.SCORING_LOCATIONS, char2) != -1) {
         setFeedback("Don't go between scoring locations.");
-        clearAll();
+        // clearAll();
         return false;
       }
       // Checks for a typo (or people messing around and typing nonsense)
       if (Array555.indexOf(Constants.AutoConstants.ALL_POINTS, char2) == -1) {
         setFeedback("You probably made a typo, or you're stupid");
-        clearAll();
+        // clearAll();
         return false;
       }
     }
     return true;
-    // Trajectory traj = new Trajectory(trajectories.get(1).getStates());
   }
 
-  public void drawPaths() {
-    clearField();
-    System.out.println("DRAWING");
-    for (int i = 0; i < trajectories.size(); i++) {
-      PathPlannerTrajectory pathTraj = trajectories.get(i);
-      List<State> states = convertStatesToStates(pathTraj.getStates());
-      Trajectory displayTrajectory = new Trajectory(states);
+  //TODO this doesn't work in 2025 API, figure out fix
+
+  // public void drawPaths() {
+  //   clearField();
+  //   System.out.println("DRAWING");
+  //   for (int i = 0; i < trajectories.size(); i++) {
+  //     PathPlannerTrajectory pathTraj = trajectories.get(i);
+  //     List<State> states = convertStatesToStates(pathTraj.getStates());
+  //     Trajectory displayTrajectory = new Trajectory(states);
       
       
-      // if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+  //     // if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
         
-      //   // displayTrajectory = displayTrajectory.relativeTo(new Pose2d(33, 0, Rotation2d.fromDegrees(180)));
-      //   displayTrajectory = displayTrajectory.relativeTo(new Pose2d(33,16, Rotation2d.fromDegrees(180)));
-      // }
+  //     //   // displayTrajectory = displayTrajectory.relativeTo(new Pose2d(33, 0, Rotation2d.fromDegrees(180)));
+  //     //   displayTrajectory = displayTrajectory.relativeTo(new Pose2d(33,16, Rotation2d.fromDegrees(180)));
+  //     // }
 
-      RobotContainer.field.getObject("traj" + i).setTrajectory(displayTrajectory);
-      // Shuffleboard.getTab("Auto").add(RobotContainer.field).withSize(6, 4).withPosition(3, 0);
-      // RobotContainer.field.
-    }
-    // ppState.ge
-  }
+  //     RobotContainer.field.getObject("traj" + i).setTrajectory(displayTrajectory);
+  //     // Shuffleboard.getTab("Auto").add(RobotContainer.field).withSize(6, 4).withPosition(3, 0);
+  //     // RobotContainer.field.
+  //   }
+  //   // ppState.ge
+  // }
 
-  public void clearField() {
-      for (int i  = 0; i < 100; i++) {
-        FieldObject2d obj = RobotContainer.field.getObject("traj" + i);
-        // obj.setPose(new Pose2d(-100, -100, Rotation2d.fromDegrees(0)));
-        obj.setTrajectory(new Trajectory());
-      }
-  }
+  // public void clearField() {
+  //     for (int i  = 0; i < 100; i++) {
+  //       FieldObject2d obj = RobotContainer.field.getObject("traj" + i);
+  //       // obj.setPose(new Pose2d(-100, -100, Rotation2d.fromDegrees(0)));
+  //       obj.setTrajectory(new Trajectory());
+  //     }
+  // }
 
-  public void clearAll() {
-    trajectories.clear();
-    clearField();
-  }
+  // public void clearAll() {
+  //   trajectories.clear();
+  //   clearField();
+  // }
 
   public boolean isStayingInLane(String autoString) {
     char[] lane;
@@ -203,7 +219,7 @@ public class Auto extends SubsystemBase {
       // Checks if character is in the lane
       if (Array555.indexOf(lane, character) == -1) {
         setFeedback("STAY IN YOUR LANE!!!");
-        clearAll();
+        // clearAll();
         return false;
       }
     }
@@ -252,32 +268,34 @@ public class Auto extends SubsystemBase {
     
   }
 
-  public List<State> convertStatesToStates(List<PathPlannerTrajectory.State> ppStates) {
-    ArrayList<State> wpiStates = new ArrayList<State>();
-    for (int i = 0; i < ppStates.size(); i++) {
-      // PathPlannerPath
-      PathPlannerTrajectory.State currentState = ppStates.get(i);
-      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        wpiStates.add(new State(
-          currentState.timeSeconds,
-          currentState.velocityMps,
-          currentState.accelerationMpsSq,
-          new Pose2d(16.54175-currentState.positionMeters.getX(), currentState.positionMeters.getY(), currentState.heading),
-          currentState.curvatureRadPerMeter
-      ));
-      } else {
-        wpiStates.add(new State(
-          currentState.timeSeconds,
-          currentState.velocityMps,
-          currentState.accelerationMpsSq,
-          new Pose2d(currentState.positionMeters.getX(), currentState.positionMeters.getY(), currentState.heading),
-          currentState.curvatureRadPerMeter
-      ));
-      }
-    }
+  // TODO this doesn't work in current Pathplanner API, fix
 
-    return wpiStates;
-  }
+  // public List<State> convertStatesToStates(List<PathPlannerTrajectoryState> ppStates) {
+  //   ArrayList<State> wpiStates = new ArrayList<State>();
+  //   for (int i = 0; i < ppStates.size(); i++) {
+  //     // PathPlannerPath
+  //     PathPlannerTrajectoryState currentState = ppStates.get(i);
+  //     if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+  //       wpiStates.add(new State(
+  //         currentState.timeSeconds,
+  //         currentState.linearVelocity,
+  //         currentState.accelerationMpsSq,
+  //         new Pose2d(16.54175-currentState.positionMeters.getX(), currentState.positionMeters.getY(), currentState.heading),
+  //         currentState.curvatureRadPerMeter
+  //     ));
+  //     } else {
+  //       wpiStates.add(new State(
+  //         currentState.timeSeconds,
+  //         currentState.linearVelocity,
+  //         currentState.accelerationMpsSq,
+  //         new Pose2d(currentState.positionMeters.getX(), currentState.positionMeters.getY(), currentState.heading),
+  //         currentState.curvatureRadPerMeter
+  //     ));
+  //     }
+  //   }
+
+    // return wpiStates;
+  // }
 
 
 
@@ -300,10 +318,10 @@ public class Auto extends SubsystemBase {
     if (isValidPath) {
       if (!ignoreSafety && isSafePath) {
         buildPathSequenceOdometry(autoString);
-        drawPaths();
+        // drawPaths();
       } else if (ignoreSafety) {
         buildPathSequenceOdometry(autoString);
-        drawPaths();
+        // drawPaths();
       }
     }
   }
@@ -356,11 +374,11 @@ public class Auto extends SubsystemBase {
         // Load path
         if (!(next == current)) {
           PathPlannerPath path = PathPlannerPath.fromPathFile("" + current + "-" + next);
-          trajectories.add(
-              path.getTrajectory(
-                new ChassisSpeeds(),
-                path.getPreviewStartingHolonomicPose().getRotation()
-              ));
+          // trajectories.add(
+          //     path.getTrajectory(
+          //       new ChassisSpeeds(),
+          //       path.getPreviewStartingHolonomicPose().getRotation()
+          //     ));
           Command cmd = Commands.sequence(AutoBuilder.followPath(path), Commands555.waitForTime(0.2).until(RobotContainer.shooter::isNoteInTransport));
           segment = new ParallelRaceGroup(cmd);
         } else {
@@ -415,7 +433,7 @@ public class Auto extends SubsystemBase {
 
 
         if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-          angle = GeometryUtil.flipFieldRotation(angle);
+          angle = Drivetrain.flipFieldRotation(angle);
         } 
         if (next != '5' || next != '7') {
           finalPath.addCommands(Commands.parallel(Commands555.goToAngleFieldRelative(Drivetrain.wrapRotation(angle), false).withTimeout(0.9)), Commands555.setSprocketAngleWithStop(RobotContainer.shooterLimelight::bestFit)

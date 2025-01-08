@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
 import static edu.wpi.first.units.Units.Revolutions;
 import static edu.wpi.first.units.Units.RevolutionsPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -9,19 +8,24 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLogOutput;
 
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -35,12 +39,12 @@ import frc.robot.util.BreakBeam;
 public class Shooter extends SubsystemBase {
 
   // The motors
-  public final CANSparkMax topMotor =
-      new CANSparkMax(Ports.SHOOTER_TOP_MOTOR, MotorType.kBrushless);
-  public final CANSparkMax bottomMotor =
-      new CANSparkMax(Ports.SHOOTER_BOTTOM_MOTOR, MotorType.kBrushless);
-  public final CANSparkMax transportMotor =
-      new CANSparkMax(Ports.SHOOTER_MOTOR_TRANSPORT, MotorType.kBrushless);
+  public final SparkMax topMotor =
+      new SparkMax(Ports.SHOOTER_TOP_MOTOR, MotorType.kBrushless);
+  public final SparkMax bottomMotor =
+      new SparkMax(Ports.SHOOTER_BOTTOM_MOTOR, MotorType.kBrushless);
+  public final SparkMax transportMotor =
+      new SparkMax(Ports.SHOOTER_MOTOR_TRANSPORT, MotorType.kBrushless);
 
   // The encoders on each motor
   private RelativeEncoder topEncoder = topMotor.getEncoder();
@@ -48,9 +52,8 @@ public class Shooter extends SubsystemBase {
   private RelativeEncoder transportEncoder = transportMotor.getEncoder();
 
   // PID controllers on each SparkMax
-  private SparkPIDController topController = topMotor.getPIDController();
-  private SparkPIDController bottomController = bottomMotor.getPIDController();
-  private SparkPIDController transportController = transportMotor.getPIDController();
+  private SparkClosedLoopController topController;
+  private SparkClosedLoopController bottomController;
 
   // Simple FeedForward calculations for each motor
   private SimpleMotorFeedforward topMotorFeedforward =
@@ -63,11 +66,6 @@ public class Shooter extends SubsystemBase {
           Constants.ShooterConstants.BOTTOM_SHOOTER_FF_KS,
           Constants.ShooterConstants.BOTTOM_SHOOTER_FF_KV,
           Constants.ShooterConstants.BOTTOM_SHOOTER_FF_KA);
-  private SimpleMotorFeedforward transportMotorFeedforward =
-      new SimpleMotorFeedforward(
-          Constants.ShooterConstants.TRANSPORT_FF_KS,
-          Constants.ShooterConstants.TRANSPORT_FF_KV,
-          Constants.ShooterConstants.TRANSPORT_FF_KA);
 
 
 
@@ -79,40 +77,40 @@ public class Shooter extends SubsystemBase {
   private double targetTopSpeed = 0;
   private double targetBottomSpeed = 0;
 
-  Debouncer m_debouncer = new Debouncer(0.3, Debouncer.DebounceType.kRising);
-
   public Shooter() {
     // Shuffleboard.getTab("Debug").addDouble("Top velocity", () -> {return topEncoder.getVelocity();});
     // Shuffleboard.getTab("Debug").addDouble("Bottom velocity", () -> {return bottomEncoder.getVelocity();});
-    topMotor.restoreFactoryDefaults();
-    bottomMotor.restoreFactoryDefaults();
-    transportMotor.restoreFactoryDefaults();
+    SparkMaxConfig topConfig = new SparkMaxConfig();
+    topConfig
+      .inverted(false)
+      .idleMode(IdleMode.kCoast);
+    topConfig.closedLoop
+      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .pid(Constants.ShooterConstants.TOP_SHOOTER_PID_KP, Constants.ShooterConstants.TOP_SHOOTER_PID_KI, Constants.ShooterConstants.TOP_SHOOTER_PID_KD)
+      .outputRange(-1, 1);
 
-    topMotor.setInverted(false);
-    bottomMotor.setInverted(false);
-    transportMotor.setInverted(true);
-    
 
-    topController.setP(Constants.ShooterConstants.TOP_SHOOTER_PID_KP, 1);
-    topController.setI(Constants.ShooterConstants.TOP_SHOOTER_PID_KI, 1);
-    topController.setD(Constants.ShooterConstants.TOP_SHOOTER_PID_KD, 1);
-    topController.setOutputRange(-1, 1, 1);
+    SparkMaxConfig bottomConfig = new SparkMaxConfig();
+    bottomConfig
+      .inverted(false)
+      .idleMode(IdleMode.kCoast);
+    bottomConfig.closedLoop
+      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .pid(Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KP, Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KI, Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KD)
+      .outputRange(-1, 1);
 
-    bottomController.setP(Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KP, 1);
-    bottomController.setI(Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KI, 1);
-    bottomController.setD(Constants.ShooterConstants.BOTTOM_SHOOTER_PID_KD, 1);
-    bottomController.setOutputRange(-1, 1);
+    SparkMaxConfig transportConfig = new SparkMaxConfig();
+    transportConfig
+      .inverted(true)
+      .idleMode(IdleMode.kBrake);
 
-    transportController.setP(Constants.ShooterConstants.TRANSPORT_PID_KP, 1);
-    transportController.setI(Constants.ShooterConstants.TRANSPORT_PID_KI, 1);
-    transportController.setD(Constants.ShooterConstants.TRANSPORT_PID_KD, 1);
-    transportController.setOutputRange(-1, 1);
-    
-    // Shuffleboard.getTab("Debug").addBoolean("Transport Beam Break", () -> {
-    //   return isNoteInTransport();
-    // });
+    topMotor.configure(topConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    bottomMotor.configure(bottomConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    transportMotor.configure(transportConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    transportMotor.setIdleMode(IdleMode.kBrake);
+    topController = topMotor.getClosedLoopController();
+    bottomController = bottomMotor.getClosedLoopController();
+
   } 
 
   /** Is shooting running? */
@@ -142,24 +140,12 @@ public class Shooter extends SubsystemBase {
     double bottomFeedForward = bottomMotorFeedforward.calculate(bottomVelocity);
     System.out.println("TopFF: " + topFeedForward + " BottomFF: " + bottomFeedForward);
 
-    topController.setReference(topVelocity, ControlType.kVelocity, 1, topFeedForward);
-    bottomController.setReference(bottomVelocity, ControlType.kVelocity, 1, bottomFeedForward);
+    topController.setReference(topVelocity, ControlType.kVelocity, ClosedLoopSlot.kSlot0, topFeedForward);
+    bottomController.setReference(bottomVelocity, ControlType.kVelocity, ClosedLoopSlot.kSlot0, bottomFeedForward);
 
     isShooting = true;
   }
 
-  
-  /** Runs transport at given velocity */
-  public void transportVelocity(double velocity) {
-    System.out.println("transportVelocity: " + velocity);
-
-    double transportFeedForward = transportMotorFeedforward.calculate(velocity);
-    System.out.println("TranportFF: " + transportFeedForward);
-
-    transportController.setReference(velocity, ControlType.kVelocity, 1, transportFeedForward);
-
-    isTransporting = true;
-  }
 
   @AutoLogOutput(key = "Shooter/IsAtSpeed")
   public boolean isAtSpeed() {
@@ -188,13 +174,6 @@ public class Shooter extends SubsystemBase {
   public void stopTransport() {
     transportMotor.stopMotor();
     isTransporting = false;
-  }
-
-  /** Shoots (used for speaker) */
-  public void shootSpeaker() {
-    topMotor.set(ShooterConstants.SPEAKER_EJECT_SPEED);
-    bottomMotor.set(ShooterConstants.SPEAKER_EJECT_SPEED);
-    
   }
 
   public void shootActually(double topSpeed, double bottomSpeed) {
@@ -258,11 +237,11 @@ public class Shooter extends SubsystemBase {
 
   public Command shooterSysId(String type, String motors, SysIdRoutine.Direction direction) {
     // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-    final MutableMeasure<Voltage> appliedVoltage = mutable(Volts.of(0));
+    final MutVoltage appliedVoltage = Volts.mutable(0);
     // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-    final MutableMeasure<Angle> rotations = mutable(Revolutions.of(0));
+    final MutAngle rotations = Revolutions.mutable(0);
     // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-    final MutableMeasure<Velocity<Angle>> velocity = mutable(RevolutionsPerSecond.of(0));
+    final MutAngularVelocity velocity = RevolutionsPerSecond.mutable(0);
 
     boolean runTop = motors.contains("top");
     boolean runBottom = motors.contains("bottom");
@@ -275,7 +254,7 @@ public class Shooter extends SubsystemBase {
             new SysIdRoutine.Config(),
             new SysIdRoutine.Mechanism(
                 // Tell SysId how to plumb the driving voltage to the motors.
-                (Measure<Voltage> volts) -> {
+                (Voltage volts) -> {
                   if (runTop) {
                     topMotor.setVoltage(volts.in(Volts));
                   }
