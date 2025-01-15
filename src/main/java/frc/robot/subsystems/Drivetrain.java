@@ -201,7 +201,7 @@ public class Drivetrain extends SubsystemBase {
   /** It drives with certain linear velocities with a certain rotational velocity */
   public void drive(Translation2d translation, double rotation) {
     
-    swerveDrive.drive(translation, rotation, this.isFieldRelative, DriveConstants.IS_OPEN_LOOP);
+    swerveDrive.drive(translation, rotation, true, false); //this.isFieldRelative, DriveConstants.IS_OPEN_LOOP);
   }
 
   
@@ -311,13 +311,13 @@ public class Drivetrain extends SubsystemBase {
     return Rotation2d.fromDegrees(angle);
   }
 
-  public void setInputFromController(CommandPS5Controller controller) {
+public void setInputFromController(CommandPS5Controller controller) {
 
     double thetaSpeed =
-        -MathUtil.applyDeadband(controller.getRightX(), 0.08) * DriveConstants.MAX_ROT_SPEED;
+        -MathUtil.applyDeadband(controller.getRightX(), 0.2) * DriveConstants.MAX_ROT_SPEED;
 
-    double xSpeed = -MathUtil.applyDeadband(controller.getLeftX(), 0.08) * DriveConstants.MAX_SPEED;
-    double ySpeed = -MathUtil.applyDeadband(controller.getLeftY(), 0.08) * DriveConstants.MAX_SPEED;
+    double xSpeed = -MathUtil.applyDeadband(controller.getLeftX(), 0.2) * DriveConstants.MAX_SPEED;
+    double ySpeed = -MathUtil.applyDeadband(controller.getLeftY(), 0.2) * DriveConstants.MAX_SPEED;
 
 
 

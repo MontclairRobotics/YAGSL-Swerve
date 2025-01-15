@@ -53,7 +53,7 @@ public class RobotContainer {
   public static Sprocket sprocket = new Sprocket();
   public static Limelight intakeLimelight = new Limelight("limelight-intake", DetectionType.NOTE);
   public static Limelight shooterLimelight = new Limelight("limelight-shooter", DetectionType.APRIL_TAG);
-  public static Auto auto = new Auto();
+  // public static Auto auto = new Auto();
   public static Climbers climbers = new Climbers();
   
 
@@ -65,8 +65,8 @@ public class RobotContainer {
 
   public RobotContainer() {
 
-    auto.setupPathPlanner();
-    auto.setupAutoTab();
+    // auto.setupPathPlanner();
+    // auto.setupAutoTab();
     setupDriverTab();
     
     Shuffleboard.getTab("Debug").addDouble("Distance", () -> {return shooterLimelight.getDistanceToSpeaker();});
@@ -250,6 +250,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     //return Commands555.setAutoPose("2");
-    return auto.getAutoCommand();
+    // return auto.getAutoCommand();
+    return Commands.runOnce(() -> {});
   }
 }
